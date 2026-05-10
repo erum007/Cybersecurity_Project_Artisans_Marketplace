@@ -1,0 +1,12 @@
+[
+  { "_id": { "$oid": "65f000000000000000000101" }, "name": "Ali Crafts", "bio": "Pottery expert", "location": "Karachi", "is_verified": true },
+  { "_id": { "$oid": "65f000000000000000000102" }, "name": "Sara Textiles", "bio": "Fabric artist", "location": "Lahore", "is_verified": false },
+  { "_id": { "$oid": "65f000000000000000000103" }, "name": "Hassan Woodworks", "bio": "Wood carving", "location": "Islamabad", "is_verified": true },
+  { "_id": { "$oid": "65f000000000000000000104" }, "name": "Ayesha Designs", "bio": "Modern crafts", "location": "Karachi", "is_verified": true },
+  { "_id": { "$oid": "65f000000000000000000105" }, "name": "Bilal Arts", "bio": "Traditional art", "location": "Multan", "is_verified": false },
+  { "_id": { "$oid": "65f000000000000000000106" }, "name": "Noor Creations", "bio": "Handmade decor", "location": "Faisalabad", "is_verified": true },
+  { "_id": { "$oid": "65f000000000000000000107" }, "name": "Zain Crafts", "bio": "Clay items", "location": "Hyderabad", "is_verified": false },
+  { "_id": { "$oid": "65f000000000000000000108" }, "name": "Fatima Studio", "bio": "Art studio", "location": "Lahore", "is_verified": true },
+  { "_id": { "$oid": "65f000000000000000000109" }, "name": "Omar Designs", "bio": "Furniture", "location": "Karachi", "is_verified": true },
+  { "_id": { "$oid": "65f000000000000000000110" }, "name": "Usman Crafts", "bio": "Decor items", "location": "Peshawar", "is_verified": false }
+]

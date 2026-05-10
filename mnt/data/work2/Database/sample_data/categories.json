@@ -1,0 +1,12 @@
+[
+  { "_id": { "$oid": "65f000000000000000000201" }, "name": "Pottery", "description": "Clay items" },
+  { "_id": { "$oid": "65f000000000000000000202" }, "name": "Textiles", "description": "Fabric products" },
+  { "_id": { "$oid": "65f000000000000000000203" }, "name": "Woodwork", "description": "Wood items" },
+  { "_id": { "$oid": "65f000000000000000000204" }, "name": "Decor", "description": "Home decor" },
+  { "_id": { "$oid": "65f000000000000000000205" }, "name": "Furniture", "description": "Furniture items" },
+  { "_id": { "$oid": "65f000000000000000000206" }, "name": "Jewelry", "description": "Accessories" },
+  { "_id": { "$oid": "65f000000000000000000207" }, "name": "Paintings", "description": "Art paintings" },
+  { "_id": { "$oid": "65f000000000000000000208" }, "name": "Ceramics", "description": "Ceramic items" },
+  { "_id": { "$oid": "65f000000000000000000209" }, "name": "Handicrafts", "description": "General crafts" },
+  { "_id": { "$oid": "65f000000000000000000210" }, "name": "Accessories", "description": "Fashion accessories" }
+]

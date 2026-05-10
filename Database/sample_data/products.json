@@ -1,0 +1,459 @@
+[{
+  "_id": {
+    "$oid": "69eccb5d8f2e3ea3973b1664"
+  },
+  "name": "Red Rugs",
+  "description": "Hand-woven and local",
+  "price": 15000,
+  "stock": 5,
+  "category": "Rugs",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/a762403e2e6ce0b36556cd889a91ce68.jpg",
+    "http://127.0.0.1:8000/uploads/b35bc8e33e8489e7c33efd3093d17c28.jpg"
+  ],
+  "artisan_id": "69eca009327f940c145de9a5",
+  "artisan_name": "Erum Arts",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T14:10:37.982Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T14:10:37.982Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf3cd8f2e3ea3973b167a"
+  },
+  "name": "Local Crochets",
+  "description": "Hand-made, khaas!",
+  "price": 3000,
+  "stock": 50,
+  "category": "Crochet/Knit",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/0767d2e89cb48566ce7a01cd905cb5c4.png",
+    "http://127.0.0.1:8000/uploads/510c7891100ac06af9b3ed3278e38ceb.png"
+  ],
+  "artisan_id": "69eca009327f940c145de9a5",
+  "artisan_name": "Erum Arts",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:03:09.440Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:03:09.440Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf3f38f2e3ea3973b167b"
+  },
+  "name": "Pottery and Ceramics",
+  "description": "The finest you will get.",
+  "price": 2000,
+  "stock": 15,
+  "category": "Clay Items",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/699416bd73d58695252cf5085112b599.jpeg",
+    "http://127.0.0.1:8000/uploads/7d2faed23cc1aca48a0d844260a36dfb.jpg"
+  ],
+  "artisan_id": "69eca009327f940c145de9a5",
+  "artisan_name": "Erum Arts",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:03:47.402Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:03:47.402Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf4248f2e3ea3973b167c"
+  },
+  "name": "Embroidered Clothes",
+  "description": "High quality, beautiful designs",
+  "price": 5000,
+  "stock": 8,
+  "category": "Textiles",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/08a460d203b59947f5404885daee1f42.jpg",
+    "http://127.0.0.1:8000/uploads/192c20c10402f3c5e4bad2cfacfb1559.jpg"
+  ],
+  "artisan_id": "69eca009327f940c145de9a5",
+  "artisan_name": "Erum Arts",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:04:36.292Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:04:36.292Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf619bff510114042dc5e"
+  },
+  "name": "Handmade Bracelets",
+  "description": "Handmade to perfection!",
+  "price": 600,
+  "stock": 23,
+  "category": "Gift Items",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/9660d7e4d70dfa7d4788a459751728ea.jpg",
+    "http://127.0.0.1:8000/uploads/79800e280d24e7dd5330059ed052a5b6.jpg"
+  ],
+  "artisan_id": "69eca009327f940c145de9a5",
+  "artisan_name": "Erum Arts",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:12:57.519Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:12:57.519Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf6eebff510114042dc5f"
+  },
+  "name": "Bunny Basket Wooden",
+  "description": "Beautiful product for your everyday use.",
+  "price": 1500,
+  "stock": 15,
+  "category": "Woodwork",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/dc31bc3c232584397fb22f89672a10bd.jpg",
+    "http://127.0.0.1:8000/uploads/0d39d150a0e549134ad1e352d0546d00.webp"
+  ],
+  "artisan_id": "69ece2d68f2e3ea3973b1673",
+  "artisan_name": "KhoobkeNamoonay",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:16:30.251Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:16:30.251Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf721bff510114042dc60"
+  },
+  "name": "Wooden Cups",
+  "description": "handmade and refined",
+  "price": 750,
+  "stock": 39,
+  "category": "Woodwork",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/cdedb3e136148639321bbfc20c787902.jpg",
+    "http://127.0.0.1:8000/uploads/66f6a444bc64f1650c41ec080017fe21.jpg"
+  ],
+  "artisan_id": "69ece2d68f2e3ea3973b1673",
+  "artisan_name": "KhoobkeNamoonay",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:17:21.662Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:17:21.662Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf795bff510114042dc61"
+  },
+  "name": "Wooden Cutlery",
+  "description": "For a great dining experience",
+  "price": 600,
+  "stock": 99,
+  "category": "Woodwork",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/5207a9c01b28f25a50e669137d86268a.jpg",
+    "http://127.0.0.1:8000/uploads/b3de7328d01f698faaeb925ebe293013.jpg"
+  ],
+  "artisan_id": "69ece2d68f2e3ea3973b1673",
+  "artisan_name": "KhoobkeNamoonay",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:19:17.135Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:19:17.135Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf7c4bff510114042dc62"
+  },
+  "name": "Wooden Shelves",
+  "description": "For a beautiful look in your house, office, or any place.",
+  "price": 17000,
+  "stock": 5,
+  "category": "Woodwork",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/2609370673aba9adec0408a2c39483a8.jpg",
+    "http://127.0.0.1:8000/uploads/19b115f108d2f226c49249611ae4aa8f.jpg"
+  ],
+  "artisan_id": "69ece2d68f2e3ea3973b1673",
+  "artisan_name": "KhoobkeNamoonay",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:20:04.808Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:20:04.808Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf895bff510114042dc63"
+  },
+  "name": "Jewellery",
+  "description": "Made with love, by hand.",
+  "price": 2000,
+  "stock": 6,
+  "category": "Gift Items",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/5a35921ba494d12918f1fdaf42de7a60.jpg",
+    "http://127.0.0.1:8000/uploads/a816ae325ddc29f089691361df92b0c1.jpg"
+  ],
+  "artisan_id": "69ece3028f2e3ea3973b1674",
+  "artisan_name": "DesiHeart",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:23:33.051Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:23:33.051Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf8c8bff510114042dc64"
+  },
+  "name": "Gift Baskets (Handmade)",
+  "description": "Filled with local products with basket made by hand.",
+  "price": 2500,
+  "stock": 19,
+  "category": "Gift Items",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/03d9abf3ffc92719d7f5d3260c31dfd5.webp",
+    "http://127.0.0.1:8000/uploads/4776522de9a51c18615379fe8ae497f8.webp"
+  ],
+  "artisan_id": "69ece3028f2e3ea3973b1674",
+  "artisan_name": "DesiHeart",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:24:24.421Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:24:24.421Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecf8f1bff510114042dc65"
+  },
+  "name": "Handmade Purses",
+  "description": "The perfect gift for fashionistas.",
+  "price": 4000,
+  "stock": 10,
+  "category": "Gift Items",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/affa2a6a77f28da7a6414c1277dd6997.jpg",
+    "http://127.0.0.1:8000/uploads/fd38965a806a2801d439f6cd2405034e.jpg",
+    "http://127.0.0.1:8000/uploads/99f33168f5cb19fdeecdba08742c1d9d.jpg"
+  ],
+  "artisan_id": "69ece3028f2e3ea3973b1674",
+  "artisan_name": "DesiHeart",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:25:05.082Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:25:05.082Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfa20bff510114042dc66"
+  },
+  "name": "Multani Blue Pottery",
+  "description": "Multani blue pottery original",
+  "price": 5000,
+  "stock": 5,
+  "category": "Clay Items",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/fa756dfaf407ec3ea0cd5559e81f97ce.jpg",
+    "http://127.0.0.1:8000/uploads/09857c4630940eba686002281ecead0d.jpg"
+  ],
+  "artisan_id": "69ece3b98f2e3ea3973b1678",
+  "artisan_name": "LocallyMade",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:30:08.772Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:30:08.772Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfa46bff510114042dc67"
+  },
+  "name": "Beautiful local crafts",
+  "description": "All sorts of beautiful crafts!",
+  "price": 700,
+  "stock": 20,
+  "category": "General",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/03374769db0fb44b2bbd9919e1610045.jpg",
+    "http://127.0.0.1:8000/uploads/8dc4dbeb5075e06aa086d7f4eef21a59.jpg"
+  ],
+  "artisan_id": "69ece3b98f2e3ea3973b1678",
+  "artisan_name": "LocallyMade",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:30:46.835Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:30:46.835Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfa6dbff510114042dc68"
+  },
+  "name": "Khussay for Women",
+  "description": "Gorgeous and refined",
+  "price": 500,
+  "stock": 29,
+  "category": "General",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/622a1802d73be8b0162444124671921d.jpg",
+    "http://127.0.0.1:8000/uploads/6e55bae40a4e7533f1ba74fe704c1cf2.jpg"
+  ],
+  "artisan_id": "69ece3b98f2e3ea3973b1678",
+  "artisan_name": "LocallyMade",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:31:25.810Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:31:25.810Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfafebff510114042dc69"
+  },
+  "name": "Quality Rugs",
+  "description": "Get all sorts of rugs at good prices!",
+  "price": 10000,
+  "stock": 9,
+  "category": "Rugs",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/9847bb22b8d563b1a4ce58c0dde1dd64.jpg",
+    "http://127.0.0.1:8000/uploads/64f9d8e671547cf889e302c5dcfa4e47.jpg"
+  ],
+  "artisan_id": "69ece3f88f2e3ea3973b1679",
+  "artisan_name": "StrivingArtist",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:33:50.544Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:33:50.544Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfb26bff510114042dc6a"
+  },
+  "name": "Local Woven Baskets",
+  "description": "Get yours now!",
+  "price": 800,
+  "stock": 40,
+  "category": "General",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/b1401ce75e8158ccbbe24b425a7a7d14.webp",
+    "http://127.0.0.1:8000/uploads/610ad32411870270133682b428c05cca.jpg"
+  ],
+  "artisan_id": "69ece3f88f2e3ea3973b1679",
+  "artisan_name": "StrivingArtist",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:34:30.991Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:34:30.991Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfb6cbff510114042dc6b"
+  },
+  "name": "Beautiful Local Crafts",
+  "description": "Only the finest!",
+  "price": 400,
+  "stock": 39,
+  "category": "General",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/1eb25448aa5a9103907b91d2ea2c13b2.jpg"
+  ],
+  "artisan_id": "69ece3f88f2e3ea3973b1679",
+  "artisan_name": "StrivingArtist",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:35:40.089Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:35:40.089Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfbb0bff510114042dc6c"
+  },
+  "name": "Tasbeeh (Prayer Beads)",
+  "description": "All for you!",
+  "price": 300,
+  "stock": 14,
+  "category": "General",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/bd63db583aa050d3b3ade9c744278129.jpg",
+    "http://127.0.0.1:8000/uploads/b33a91df74a34e27dec0892363ac7f90.jpg"
+  ],
+  "artisan_id": "69ece3f88f2e3ea3973b1679",
+  "artisan_name": "StrivingArtist",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:36:48.233Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:36:48.233Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfbe7bff510114042dc6d"
+  },
+  "name": "Tote Bags",
+  "description": "Beautiful and handmade tote bags.",
+  "price": 700,
+  "stock": 29,
+  "category": "Textiles",
+  "image_urls": [
+    "http://127.0.0.1:8000/uploads/1fdad77373e707d6f2d2f287cad0847b.jpg"
+  ],
+  "artisan_id": "69ece3f88f2e3ea3973b1679",
+  "artisan_name": "StrivingArtist",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T17:37:43.728Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:37:43.728Z"
+  }
+}]

@@ -1,0 +1,96 @@
+[{
+  "_id": {
+    "$oid": "69ecfc0fbff510114042dc6e"
+  },
+  "user_id": "69ec9a1b327f940c145de9a4",
+  "items": [
+    {
+      "product_id": "69ecf3f38f2e3ea3973b167b",
+      "quantity": 1
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "69ecfc2dbff510114042dc6f"
+  },
+  "user_id": "69ece32d8f2e3ea3973b1675",
+  "items": [
+    {
+      "product_id": "69ecf7c4bff510114042dc62",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecf795bff510114042dc61",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecf3f38f2e3ea3973b167b",
+      "quantity": 1
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "69ecfc67bff510114042dc71"
+  },
+  "user_id": "69ece2448f2e3ea3973b1672",
+  "items": [
+    {
+      "product_id": "69ecfa6dbff510114042dc68",
+      "quantity": 1
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "69ecfce7bff510114042dc73"
+  },
+  "user_id": "69ece3598f2e3ea3973b1676",
+  "items": [
+    {
+      "product_id": "69ecf6eebff510114042dc5f",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecf3f38f2e3ea3973b167b",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecf3cd8f2e3ea3973b167a",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecfb26bff510114042dc6a",
+      "quantity": 1
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "69ecfd2abff510114042dc75"
+  },
+  "user_id": "69ece38c8f2e3ea3973b1677",
+  "items": [
+    {
+      "product_id": "69ecf7c4bff510114042dc62",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecf795bff510114042dc61",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecf4248f2e3ea3973b167c",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecf3cd8f2e3ea3973b167a",
+      "quantity": 1
+    },
+    {
+      "product_id": "69ecfafebff510114042dc69",
+      "quantity": 1
+    }
+  ]
+}]

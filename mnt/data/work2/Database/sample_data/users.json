@@ -1,0 +1,12 @@
+[
+  { "_id": { "$oid": "65f000000000000000000001" }, "username": "user1", "email": "user1@example.com", "password_hash": "hash1" },
+  { "_id": { "$oid": "65f000000000000000000002" }, "username": "user2", "email": "user2@example.com", "password_hash": "hash2" },
+  { "_id": { "$oid": "65f000000000000000000003" }, "username": "user3", "email": "user3@example.com", "password_hash": "hash3" },
+  { "_id": { "$oid": "65f000000000000000000004" }, "username": "user4", "email": "user4@example.com", "password_hash": "hash4" },
+  { "_id": { "$oid": "65f000000000000000000005" }, "username": "user5", "email": "user5@example.com", "password_hash": "hash5" },
+  { "_id": { "$oid": "65f000000000000000000006" }, "username": "user6", "email": "user6@example.com", "password_hash": "hash6" },
+  { "_id": { "$oid": "65f000000000000000000007" }, "username": "user7", "email": "user7@example.com", "password_hash": "hash7" },
+  { "_id": { "$oid": "65f000000000000000000008" }, "username": "user8", "email": "user8@example.com", "password_hash": "hash8" },
+  { "_id": { "$oid": "65f000000000000000000009" }, "username": "user9", "email": "user9@example.com", "password_hash": "hash9" },
+  { "_id": { "$oid": "65f000000000000000000010" }, "username": "user10", "email": "user10@example.com", "password_hash": "hash10" }
+]

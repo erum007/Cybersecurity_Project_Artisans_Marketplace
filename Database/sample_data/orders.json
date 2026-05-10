@@ -1,0 +1,418 @@
+[{
+  "_id": {
+    "$oid": "69eccbb98f2e3ea3973b1666"
+  },
+  "customer_id": "69ec9a1b327f940c145de9a4",
+  "customer_name": "Erum Naushad",
+  "items": [
+    {
+      "product_id": "69eccb5d8f2e3ea3973b1664",
+      "name": "Red Rugs",
+      "artisan_id": "69eca009327f940c145de9a5",
+      "quantity": 1,
+      "price": 15000,
+      "line_total": 15000
+    }
+  ],
+  "total_amount": 15000,
+  "payment_method": "cod",
+  "shipping_address": "Wtvr Street",
+  "status": "completed",
+  "placed_at": {
+    "$date": "2026-04-25T14:12:09.772Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T14:12:09.772Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T14:17:09.979Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69eccbc68f2e3ea3973b1667"
+  },
+  "customer_id": "69ec9a1b327f940c145de9a4",
+  "customer_name": "Erum Naushad",
+  "items": [
+    {
+      "product_id": "69eccb5d8f2e3ea3973b1664",
+      "name": "Red Rugs",
+      "artisan_id": "69eca009327f940c145de9a5",
+      "quantity": 1,
+      "price": 15000,
+      "line_total": 15000
+    }
+  ],
+  "total_amount": 15000,
+  "payment_method": "card",
+  "shipping_address": "Wtvr Street",
+  "status": "completed",
+  "placed_at": {
+    "$date": "2026-04-25T14:12:22.217Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T14:12:22.217Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T14:17:08.051Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfc3cbff510114042dc70"
+  },
+  "customer_id": "69ece32d8f2e3ea3973b1675",
+  "customer_name": "Aneesa Ahmed",
+  "items": [
+    {
+      "product_id": "69ecf4248f2e3ea3973b167c",
+      "name": "Embroidered Clothes",
+      "artisan_id": "69eca009327f940c145de9a5",
+      "quantity": 1,
+      "price": 5000,
+      "line_total": 5000
+    },
+    {
+      "product_id": "69ecf619bff510114042dc5e",
+      "name": "Handmade Bracelets",
+      "artisan_id": "69eca009327f940c145de9a5",
+      "quantity": 1,
+      "price": 600,
+      "line_total": 600
+    },
+    {
+      "product_id": "69ecf8f1bff510114042dc65",
+      "name": "Handmade Purses",
+      "artisan_id": "69ece3028f2e3ea3973b1674",
+      "quantity": 1,
+      "price": 4000,
+      "line_total": 4000
+    }
+  ],
+  "total_amount": 9600,
+  "payment_method": "cod",
+  "shipping_address": "Mein beghar hun",
+  "status": "completed",
+  "placed_at": {
+    "$date": "2026-04-25T17:39:08.266Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:39:08.266Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:46:20.992Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfc6fbff510114042dc72"
+  },
+  "customer_id": "69ece2448f2e3ea3973b1672",
+  "customer_name": "Rabia Khan",
+  "items": [
+    {
+      "product_id": "69ecfbb0bff510114042dc6c",
+      "name": "Tasbeeh (Prayer Beads)",
+      "artisan_id": "69ece3f88f2e3ea3973b1679",
+      "quantity": 1,
+      "price": 300,
+      "line_total": 300
+    },
+    {
+      "product_id": "69ecfbe7bff510114042dc6d",
+      "name": "Tote Bags",
+      "artisan_id": "69ece3f88f2e3ea3973b1679",
+      "quantity": 1,
+      "price": 700,
+      "line_total": 700
+    },
+    {
+      "product_id": "69ecfafebff510114042dc69",
+      "name": "Quality Rugs",
+      "artisan_id": "69ece3f88f2e3ea3973b1679",
+      "quantity": 1,
+      "price": 10000,
+      "line_total": 10000
+    }
+  ],
+  "total_amount": 11000,
+  "payment_method": "cod",
+  "shipping_address": "Ghar",
+  "status": "pending",
+  "placed_at": {
+    "$date": "2026-04-25T17:39:59.348Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:39:59.348Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:39:59.348Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfcfabff510114042dc74"
+  },
+  "customer_id": "69ece3598f2e3ea3973b1676",
+  "customer_name": "Ali Hassan",
+  "items": [
+    {
+      "product_id": "69ecfa20bff510114042dc66",
+      "name": "Multani Blue Pottery",
+      "artisan_id": "69ece3b98f2e3ea3973b1678",
+      "quantity": 1,
+      "price": 5000,
+      "line_total": 5000
+    },
+    {
+      "product_id": "69ecfb26bff510114042dc6a",
+      "name": "Local Woven Baskets",
+      "artisan_id": "69ece3f88f2e3ea3973b1679",
+      "quantity": 1,
+      "price": 800,
+      "line_total": 800
+    },
+    {
+      "product_id": "69ecf895bff510114042dc63",
+      "name": "Jewellery",
+      "artisan_id": "69ece3028f2e3ea3973b1674",
+      "quantity": 1,
+      "price": 2000,
+      "line_total": 2000
+    },
+    {
+      "product_id": "69ecf795bff510114042dc61",
+      "name": "Wooden Cutlery",
+      "artisan_id": "69ece2d68f2e3ea3973b1673",
+      "quantity": 1,
+      "price": 600,
+      "line_total": 600
+    },
+    {
+      "product_id": "69ecf721bff510114042dc60",
+      "name": "Wooden Cups",
+      "artisan_id": "69ece2d68f2e3ea3973b1673",
+      "quantity": 1,
+      "price": 750,
+      "line_total": 750
+    }
+  ],
+  "total_amount": 9150,
+  "payment_method": "cod",
+  "shipping_address": "ABS Street",
+  "status": "processing",
+  "placed_at": {
+    "$date": "2026-04-25T17:42:18.238Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:42:18.238Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:46:18.004Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ecfd36bff510114042dc76"
+  },
+  "customer_id": "69ece38c8f2e3ea3973b1677",
+  "customer_name": "Areena Ilyas",
+  "items": [
+    {
+      "product_id": "69ecf619bff510114042dc5e",
+      "name": "Handmade Bracelets",
+      "artisan_id": "69eca009327f940c145de9a5",
+      "quantity": 1,
+      "price": 600,
+      "line_total": 600
+    },
+    {
+      "product_id": "69ecfb6cbff510114042dc6b",
+      "name": "Beautiful Local Crafts",
+      "artisan_id": "69ece3f88f2e3ea3973b1679",
+      "quantity": 1,
+      "price": 400,
+      "line_total": 400
+    },
+    {
+      "product_id": "69ecfa6dbff510114042dc68",
+      "name": "Khussay for Women",
+      "artisan_id": "69ece3b98f2e3ea3973b1678",
+      "quantity": 1,
+      "price": 500,
+      "line_total": 500
+    }
+  ],
+  "total_amount": 1500,
+  "payment_method": "cod",
+  "shipping_address": "Kati Pharai",
+  "status": "pending",
+  "placed_at": {
+    "$date": "2026-04-25T17:43:18.679Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:43:18.679Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:43:18.679Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ed004ebff510114042dc77"
+  },
+  "customer_id": "69ece32d8f2e3ea3973b1675",
+  "customer_name": "Aneesa Ahmed",
+  "items": [
+    {
+      "product_id": "69ecfa20bff510114042dc66",
+      "name": "Multani Blue Pottery",
+      "artisan_id": "69ece3b98f2e3ea3973b1678",
+      "quantity": 1,
+      "price": 5000,
+      "line_total": 5000
+    },
+    {
+      "product_id": "69ecfb26bff510114042dc6a",
+      "name": "Local Woven Baskets",
+      "artisan_id": "69ece3f88f2e3ea3973b1679",
+      "quantity": 1,
+      "price": 800,
+      "line_total": 800
+    }
+  ],
+  "total_amount": 5800,
+  "payment_method": "cod",
+  "shipping_address": "Mein beghar hun",
+  "status": "pending",
+  "placed_at": {
+    "$date": "2026-04-25T17:56:30.608Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:56:30.608Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:56:30.608Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ed0063bff510114042dc78"
+  },
+  "customer_id": "69ece32d8f2e3ea3973b1675",
+  "customer_name": "Aneesa Ahmed",
+  "items": [
+    {
+      "product_id": "69ecf4248f2e3ea3973b167c",
+      "name": "Embroidered Clothes",
+      "artisan_id": "69eca009327f940c145de9a5",
+      "quantity": 1,
+      "price": 5000,
+      "line_total": 5000
+    }
+  ],
+  "total_amount": 5000,
+  "payment_method": "cod",
+  "shipping_address": "Mein beghar hun",
+  "status": "pending",
+  "placed_at": {
+    "$date": "2026-04-25T17:56:51.724Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:56:51.724Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:56:51.724Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ed006fbff510114042dc79"
+  },
+  "customer_id": "69ece32d8f2e3ea3973b1675",
+  "customer_name": "Aneesa Ahmed",
+  "items": [
+    {
+      "product_id": "69ecf8f1bff510114042dc65",
+      "name": "Handmade Purses",
+      "artisan_id": "69ece3028f2e3ea3973b1674",
+      "quantity": 1,
+      "price": 4000,
+      "line_total": 4000
+    }
+  ],
+  "total_amount": 4000,
+  "payment_method": "cod",
+  "shipping_address": "Mein beghar hun",
+  "status": "pending",
+  "placed_at": {
+    "$date": "2026-04-25T17:57:03.443Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:57:03.443Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:57:03.443Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ed0079bff510114042dc7a"
+  },
+  "customer_id": "69ece32d8f2e3ea3973b1675",
+  "customer_name": "Aneesa Ahmed",
+  "items": [
+    {
+      "product_id": "69ecf7c4bff510114042dc62",
+      "name": "Wooden Shelves",
+      "artisan_id": "69ece2d68f2e3ea3973b1673",
+      "quantity": 1,
+      "price": 17000,
+      "line_total": 17000
+    }
+  ],
+  "total_amount": 17000,
+  "payment_method": "cod",
+  "shipping_address": "Mein beghar hun",
+  "status": "pending",
+  "placed_at": {
+    "$date": "2026-04-25T17:57:13.751Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:57:13.751Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:57:13.751Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ed0083bff510114042dc7b"
+  },
+  "customer_id": "69ece32d8f2e3ea3973b1675",
+  "customer_name": "Aneesa Ahmed",
+  "items": [
+    {
+      "product_id": "69ecf8c8bff510114042dc64",
+      "name": "Gift Baskets (Handmade)",
+      "artisan_id": "69ece3028f2e3ea3973b1674",
+      "quantity": 1,
+      "price": 2500,
+      "line_total": 2500
+    }
+  ],
+  "total_amount": 2500,
+  "payment_method": "cod",
+  "shipping_address": "Mein beghar hun",
+  "status": "pending",
+  "placed_at": {
+    "$date": "2026-04-25T17:57:23.916Z"
+  },
+  "created_at": {
+    "$date": "2026-04-25T17:57:23.916Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T17:57:23.916Z"
+  }
+}]

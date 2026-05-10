@@ -1,6 +1,0 @@
-1. Please visit https://cors-anywhere.herokuapp.com/corsdemo and click on "Request temporary access to the demo server" before using the app.
-2. You can find our Android app's APK in platforms/android/app/build/outputs/apk/debug/app-debug.apk
-3. Our code and all assets used in it can be found in the www folder.
-4. When using the app, shift to landscape orientation when accessing "Disaster Detectors" and "Disaster Managers" for a better experience.
-5. Please allow access to the app to your location, and allow access to your browser for camera.
-6. API keys do not work.

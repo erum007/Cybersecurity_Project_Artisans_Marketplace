@@ -1,0 +1,12 @@
+[
+  { "_id": { "$oid": "65f000000000000000000401" }, "user_id": { "$oid": "65f000000000000000000001" }, "total_amount": 1200.5, "status": "Processing" },
+  { "_id": { "$oid": "65f000000000000000000402" }, "user_id": { "$oid": "65f000000000000000000002" }, "total_amount": 3500, "status": "Shipped" },
+  { "_id": { "$oid": "65f000000000000000000403" }, "user_id": { "$oid": "65f000000000000000000003" }, "total_amount": 7000, "status": "Delivered" },
+  { "_id": { "$oid": "65f000000000000000000404" }, "user_id": { "$oid": "65f000000000000000000004" }, "total_amount": 2000, "status": "Processing" },
+  { "_id": { "$oid": "65f000000000000000000405" }, "user_id": { "$oid": "65f000000000000000000005" }, "total_amount": 15000, "status": "Shipped" },
+  { "_id": { "$oid": "65f000000000000000000406" }, "user_id": { "$oid": "65f000000000000000000006" }, "total_amount": 1800, "status": "Delivered" },
+  { "_id": { "$oid": "65f000000000000000000407" }, "user_id": { "$oid": "65f000000000000000000007" }, "total_amount": 5000, "status": "Processing" },
+  { "_id": { "$oid": "65f000000000000000000408" }, "user_id": { "$oid": "65f000000000000000000008" }, "total_amount": 2200, "status": "Shipped" },
+  { "_id": { "$oid": "65f000000000000000000409" }, "user_id": { "$oid": "65f000000000000000000009" }, "total_amount": 900, "status": "Delivered" },
+  { "_id": { "$oid": "65f000000000000000000410" }, "user_id": { "$oid": "65f000000000000000000010" }, "total_amount": 1200, "status": "Processing" }
+]

@@ -1,0 +1,190 @@
+[{
+  "_id": {
+    "$oid": "69ec9a1b327f940c145de9a4"
+  },
+  "full_name": "Erum Naushad",
+  "email": "erumoct07@gmail.com",
+  "password_hash": "bace9c0cf33eca0c01d145e6c36669f0330e36fd9f2f460783a006d3b1b94b86",
+  "role": "customer",
+  "phone": "03005502968",
+  "address": "Wtvr Street",
+  "city": "Karachi",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T10:40:27.983Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T10:40:27.983Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69eca009327f940c145de9a5"
+  },
+  "full_name": "Erum Arts",
+  "email": "erum07oct003@gmail.com",
+  "password_hash": "e5d612fa0b0665da0f94ff88ac8e4b66ccd0be975c9b5d61ea51b19dc0f41330",
+  "role": "artisan",
+  "phone": "03330666626",
+  "address": "wtvr",
+  "city": "Karachi",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T11:05:45.332Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T11:05:45.332Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece2448f2e3ea3973b1672"
+  },
+  "full_name": "Rabia Khan",
+  "email": "rabiakhan@gmail.com",
+  "password_hash": "677355b74ca5e5b40845d3917191ec49cfc4271ecc4c34c4beb84dc60f252260",
+  "role": "customer",
+  "phone": "0333333333",
+  "address": "Ghar",
+  "city": "Karachi",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:48:20.983Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:48:20.983Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece2d68f2e3ea3973b1673"
+  },
+  "full_name": "KhoobkeNamoonay",
+  "email": "kaam@gmail.com",
+  "password_hash": "e930ebb4060d80634d14daddd0904e5856f1b5c89f75a0fc616cdf7ab0c13b3a",
+  "role": "artisan",
+  "phone": "0345678912",
+  "address": "KaamGhar",
+  "city": "Sialkot",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:50:46.990Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:50:46.990Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece3028f2e3ea3973b1674"
+  },
+  "full_name": "DesiHeart",
+  "email": "desi@hotmail.com",
+  "password_hash": "13516f7c1a4e5bbd9e1eaab779033f89c11d54b70b57908a7b7c213658eb3ff2",
+  "role": "artisan",
+  "phone": "0378649375",
+  "address": "Kaam ka Kamra",
+  "city": "Lahore",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:51:30.767Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:51:30.767Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece32d8f2e3ea3973b1675"
+  },
+  "full_name": "Aneesa Ahmed",
+  "email": "aneesaahmed@outlook.com",
+  "password_hash": "b5ed73319a235a9a1ce69a50a4604d96096ee264c24600bda9147968e2ec6785",
+  "role": "customer",
+  "phone": "0333768403",
+  "address": "Mein beghar hun",
+  "city": "Lahore",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:52:13.442Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:52:13.442Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece3598f2e3ea3973b1676"
+  },
+  "full_name": "Ali Hassan",
+  "email": "alihassan@gmail.com",
+  "password_hash": "687679452b35bd5f6a25c071ba7bcaa7a70b6b3ffd388b4c7c2ce86d8a7e2d06",
+  "role": "customer",
+  "phone": "03764930589",
+  "address": "ABS Street",
+  "city": "Hyderabad",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:52:57.210Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:52:57.210Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece38c8f2e3ea3973b1677"
+  },
+  "full_name": "Areena Ilyas",
+  "email": "areenailyas@yahoo.com",
+  "password_hash": "a6fc981a8666b88983282d8451d7f68604d035f0f3b00f96a21032cfc52d23df",
+  "role": "customer",
+  "phone": "037586942234",
+  "address": "Kati Pharai",
+  "city": "Quetta",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:53:48.610Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:53:48.610Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece3b98f2e3ea3973b1678"
+  },
+  "full_name": "LocallyMade",
+  "email": "localdil@yahoo.com",
+  "password_hash": "7113fcb4068328592ee0e560b89d539a579f8f0cf6ce3cc8f214b340fc64e39e",
+  "role": "artisan",
+  "phone": "0367459430",
+  "address": "Multan Ghar",
+  "city": "Multan",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:54:33.160Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:54:33.160Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69ece3f88f2e3ea3973b1679"
+  },
+  "full_name": "StrivingArtist",
+  "email": "survivor45@gmail.com",
+  "password_hash": "c55a473f2c9fd81f10fa3fbaf850ea0e8276391e2025c4598d6aead82fa5c695",
+  "role": "artisan",
+  "phone": "03478996598",
+  "address": "XYZ",
+  "city": "Rawalpindi",
+  "is_active": true,
+  "created_at": {
+    "$date": "2026-04-25T15:55:36.644Z"
+  },
+  "updated_at": {
+    "$date": "2026-04-25T15:55:36.644Z"
+  }
+}]
