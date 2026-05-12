@@ -66,7 +66,7 @@ services:
     build: ./FrontEnd
     # You can keep this port, but you will mostly use https://artisan.marketplace now
     ports:
-      - "51235:80" 
+      - "3000:80" 
     depends_on:
       - backend
 
