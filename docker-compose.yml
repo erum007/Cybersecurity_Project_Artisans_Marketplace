@@ -1,0 +1,87 @@
+# services:
+
+#   db:
+#     image: mongo:latest  # No Dockerfile needed, pulls from Docker Hub
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - mongo-data:/data/db # Persists your data even if the container stops
+
+#   backend:
+#     build: ./BackEnd
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - db
+#     environment:
+#       # Use 'db' instead of 'localhost' so the backend can find the database
+#       - DATABASE_URL=mongodb://db:27017/artisans-marketplace
+#     volumes:
+#       # Persists any images uploaded to the uploads folder
+#       - ./BackEnd/uploads:/app/uploads
+  
+#   frontend:
+#     build: ./FrontEnd
+#     ports:
+#       - "51235:80" # Maps your local port to the container
+#     depends_on:
+#       - backend
+
+# volumes:
+#   mongo-data:
+
+# proxy:
+#     image: nginx:alpine
+#     ports:
+#       - "443:443"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+#       - ./artisan.crt:/etc/nginx/ssl/artisan.crt:ro
+#       - ./artisan.key:/etc/nginx/ssl/artisan.key:ro
+#     depends_on:
+#       - frontend
+#       - backend
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: ./BackEnd
+    # We keep 8000 open for testing, but Nginx will handle the "real" traffic
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mongodb://db:27017/
+      - MONGO_DB=artisan-marketplace
+    volumes:
+      - ./BackEnd/uploads:/app/uploads
+  
+  frontend:
+    build: ./FrontEnd
+    # You can keep this port, but you will mostly use https://artisan.marketplace now
+    ports:
+      - "51235:80" 
+    depends_on:
+      - backend
+
+  proxy:
+    image: nginx:alpine
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./artisan.crt:/etc/nginx/ssl/artisan.crt:ro
+      - ./artisan.key:/etc/nginx/ssl/artisan.key:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  mongo-data:
+

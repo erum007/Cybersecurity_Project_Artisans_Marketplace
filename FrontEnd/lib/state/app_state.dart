@@ -404,11 +404,15 @@ class AppState extends ChangeNotifier {
     adminService = AdminService(api);
   }
 
-  static const String _baseUrl = String.fromEnvironment(
+  // static const String _baseUrl = String.fromEnvironment(
+  //   'API_BASE_URL',
+  //   defaultValue: 'http://10.0.2.2:8000',
+  // );
+static const String _baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000',
+    defaultValue: 'https://artisan.marketplace',
   );
-
+  
   final ApiClient api;
   final SessionStore sessionStore;
   late final AuthService authService;
@@ -536,7 +540,7 @@ class AppState extends ChangeNotifier {
       final relativeUrl = await service.uploadProductImage(file);
       final fullUrl = relativeUrl.startsWith('http') ? relativeUrl : '$_baseUrl$relativeUrl';
       // Always store 127.0.0.1 in the database regardless of the environment
-      final dbUrl = fullUrl.replaceAll('10.0.2.2', '127.0.0.1');
+      final dbUrl = fullUrl.replaceAll('artisan.marketplace', '127.0.0.1');
       await updateProfile(profilePicture: dbUrl);
       return dbUrl;
     } catch (e) {
@@ -564,7 +568,7 @@ class AppState extends ChangeNotifier {
       final relativeUrl = await service.uploadProductImage(file);
       final fullUrl = relativeUrl.startsWith('http') ? relativeUrl : '$_baseUrl$relativeUrl';
       // Always store 127.0.0.1 in the database regardless of the environment
-      return fullUrl.replaceAll('10.0.2.2', '127.0.0.1');
+      return fullUrl.replaceAll('artisan.marketplace', '127.0.0.1');
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');
       rethrow;
