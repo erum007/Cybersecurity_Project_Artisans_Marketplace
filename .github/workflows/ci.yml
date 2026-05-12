@@ -1,0 +1,589 @@
+# Complete Docker + DevSecOps Setup (Updated for Your Actual Project)
+
+This version is specifically adapted for:
+
+* Flutter frontend
+* FastAPI backend
+* Separate database folder
+* JSON mock data loading
+* MongoDB container
+* Docker Compose
+* GitHub Actions DevSecOps pipeline
+* OWASP ZAP DAST scanning
+
+Based on your actual commands:
+
+Backend:
+
+```bash
+python -m uvicorn app.main:app --reload
+```
+
+Frontend:
+
+```bash
+flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8000
+```
+
+---
+
+# 1. RECOMMENDED PROJECT STRUCTURE
+
+```text
+Project/
+│
+├── frontend/
+│   ├── Dockerfile
+│   ├── pubspec.yaml
+│   └── ...
+│
+├── backend/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── app/
+│   │   ├── main.py
+│   │   └── ...
+│   └── ...
+│
+├── database/
+│   ├── DBinit.py
+│   ├── mockdata.json
+│   └── ...
+│
+├── docker-compose.yml
+│
+└── .github/
+    └── workflows/
+        └── devsecops.yml
+```
+
+---
+
+# 2. FRONTEND DOCKERFILE
+
+File:
+
+```text
+frontend/Dockerfile
+```
+
+Code:
+
+```dockerfile
+# BUILD STAGE
+FROM ghcr.io/cirruslabs/flutter:stable AS build
+
+WORKDIR /app
+
+COPY . .
+
+RUN flutter pub get
+
+RUN flutter build web \
+    --dart-define=API_BASE_URL=http://localhost:8000
+
+# SERVE STAGE
+FROM nginx:alpine
+
+COPY --from=build /app/build/web /usr/share/nginx/html
+
+EXPOSE 80
+```
+
+---
+
+# 3. BACKEND DOCKERFILE
+
+File:
+
+```text
+backend/Dockerfile
+```
+
+Code:
+
+```dockerfile
+FROM python:3.11
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+---
+
+# 4. DATABASE INITIALIZATION SCRIPT
+
+Your database folder stays separate.
+
+File:
+
+```text
+database/DBinit.py
+```
+
+Example MongoDB version:
+
+```python
+import json
+import time
+from pymongo import MongoClient
+
+# WAIT FOR MONGODB
+while True:
+    try:
+        client = MongoClient("mongodb://mongodb:27017")
+        client.server_info()
+        print("Connected to MongoDB")
+        break
+    except Exception:
+        print("Waiting for MongoDB...")
+        time.sleep(5)
+
+# DATABASE
+
+db = client["mydatabase"]
+collection = db["users"]
+
+# CLEAR OLD DATA
+collection.delete_many({})
+
+# LOAD MOCK DATA
+with open("/database/mockdata.json") as f:
+    data = json.load(f)
+
+if isinstance(data, list):
+    collection.insert_many(data)
+else:
+    collection.insert_one(data)
+
+print("Mock data inserted successfully")
+```
+
+---
+
+# 5. REQUIREMENTS.TXT
+
+Make sure backend/requirements.txt contains:
+
+```text
+fastapi
+uvicorn
+pymongo
+```
+
+plus your other packages.
+
+---
+
+# 6. DOCKER COMPOSE FILE
+
+File:
+
+```text
+docker-compose.yml
+```
+
+Code:
+
+```yaml
+services:
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+
+  dbinit:
+    image: python:3.11
+    container_name: dbinit
+    working_dir: /database
+    volumes:
+      - ./database:/database
+    depends_on:
+      - mongodb
+    command: >
+      sh -c "pip install pymongo && python DBinit.py"
+
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - dbinit
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+```
+
+---
+
+# 7. IMPORTANT FLUTTER API URL
+
+You currently use:
+
+```bash
+flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8000
+```
+
+For Docker production build we changed it to:
+
+```text
+http://localhost:8000
+```
+
+inside frontend Dockerfile.
+
+That works because:
+
+```text
+Browser on your PC
+→ localhost:8000
+→ Docker backend container
+```
+
+---
+
+# 8. GITHUB ACTIONS DEVSECOPS PIPELINE
+
+File:
+
+```text
+.github/workflows/devsecops.yml
+```
+
+Code:
+
+```yaml
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: ["**"]
+
+  pull_request:
+    branches: ["**"]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+
+  # ─────────────────────────────────────────
+  # SAST
+  # ─────────────────────────────────────────
+  sast:
+    name: SAST - Backend + Flutter Scan
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # PYTHON
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: |
+          pip install -r requirements.txt
+
+      # BANDIT
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit Scan
+        run: |
+          bandit -r backend \
+          -f json \
+          -o bandit-report.json || true
+
+      # SEMGREP
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep Scan
+        run: |
+          semgrep \
+            --config "p/security-audit" \
+            --config "p/secrets" \
+            --config "p/python" \
+            --config "p/javascript" \
+            --json \
+            --output semgrep-report.json \
+            . || true
+
+      # FLUTTER
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+
+      - name: Flutter Pub Get
+        working-directory: ./frontend
+        run: flutter pub get
+
+      - name: Flutter Analyze
+        working-directory: ./frontend
+        run: flutter analyze
+
+      # UPLOAD REPORTS
+      - name: Upload SAST Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sast-reports
+          path: |
+            bandit-report.json
+            semgrep-report.json
+
+  # ─────────────────────────────────────────
+  # SCA
+  # ─────────────────────────────────────────
+  sca:
+    name: SCA - Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # PYTHON
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run pip-audit
+        working-directory: ./backend
+        run: |
+          pip-audit \
+          -r requirements.txt \
+          --format json \
+          > pip-audit-report.json || true
+
+      # TRIVY
+      - name: Run Trivy Filesystem Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "json"
+          output: "trivy-report.json"
+
+      # UPLOAD REPORTS
+      - name: Upload SCA Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sca-reports
+          path: |
+            backend/pip-audit-report.json
+            trivy-report.json
+
+  # ─────────────────────────────────────────
+  # DOCKER BUILD
+  # ─────────────────────────────────────────
+  docker:
+    name: Docker Build Verification
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker Containers
+        run: docker compose build
+
+  # ─────────────────────────────────────────
+  # DAST
+  # ─────────────────────────────────────────
+  dast:
+    name: DAST - OWASP ZAP Scan
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # BUILD + START
+      - name: Build Containers
+        run: docker compose build
+
+      - name: Start Containers
+        run: docker compose up -d
+
+      - name: Wait for Startup
+        run: sleep 45
+
+      # REPORT FILES
+      - name: Pre-create ZAP Report Files
+        run: |
+          touch report_html.html report_json.json report_md.md
+          chmod a+rw report_html.html report_json.json report_md.md
+
+      # ZAP SCAN
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: "http://localhost:3000"
+          fail_action: false
+          allow_issue_writing: false
+          cmd_options: "-a"
+
+        continue-on-error: true
+
+      # UPLOAD REPORTS
+      - name: Upload ZAP Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dast-zap-report
+          path: |
+            report_html.html
+            report_json.json
+            report_md.md
+          if-no-files-found: warn
+```
+
+---
+
+# 9. BUILD LOCALLY
+
+Open terminal in project root:
+
+```bash
+docker compose build
+```
+
+---
+
+# 10. RUN LOCALLY
+
+```bash
+docker compose up
+```
+
+Detached:
+
+```bash
+docker compose up -d
+```
+
+---
+
+# 11. STOP CONTAINERS
+
+```bash
+docker compose down
+```
+
+---
+
+# 12. VERIFY CONTAINERS
+
+```bash
+docker ps
+```
+
+You should see:
+
+* mongodb
+* dbinit
+* backend
+* frontend
+
+running.
+
+---
+
+# 13. LOCAL URLS
+
+Frontend:
+
+```text
+http://localhost:3000
+```
+
+Backend:
+
+```text
+http://localhost:8000
+```
+
+MongoDB:
+
+```text
+mongodb://localhost:27017
+```
+
+---
+
+# 14. IMPORTANT NOTES
+
+DO NOT use:
+
+```bash
+flutter run -d chrome
+```
+
+inside Docker.
+
+Docker uses:
+
+```bash
+flutter build web
+```
+
+for stable production hosting.
+
+---
+
+# 15. WHAT THIS SETUP GIVES YOU
+
+This setup includes:
+
+* Dockerized Flutter frontend
+* Dockerized FastAPI backend
+* Separate database folder
+* MongoDB container
+* Automatic JSON mock-data loading
+* GitHub Actions CI/CD
+* SAST security scanning
+* SCA dependency scanning
+* DAST OWASP ZAP scanning
+* Downloadable security reports
+* Containerized deployment
+* Professional DevSecOps architecture
