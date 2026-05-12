@@ -3,20 +3,20 @@ name: DevSecOps Pipeline
 on:
   push:
     branches: ["**"]
-
   pull_request:
     branches: ["**"]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+
+# ─────────────────────────────────────────
+# SAST
+# ─────────────────────────────────────────
 jobs:
 
-  # ─────────────────────────────────────────
-  # SAST
-  # ─────────────────────────────────────────
   sast:
-    name: SAST - BackEnd + Flutter Scan
+    name: SAST - Backend + Flutter Scan
     runs-on: ubuntu-latest
 
     steps:
@@ -24,16 +24,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # PYTHON
+      # PYTHON SETUP
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install BackEnd Dependencies
-        working-directory: ./BackEnd
-        run: |
-          pip install -r requirements.txt
+      - name: Install Backend Dependencies
+        working-directory: ./Backend
+        run: pip install -r requirements.txt
 
       # BANDIT
       - name: Install Bandit
@@ -41,7 +40,7 @@ jobs:
 
       - name: Run Bandit Scan
         run: |
-          bandit -r BackEnd \
+          bandit -r Backend \
           -f json \
           -o bandit-report.json || true
 
@@ -67,14 +66,14 @@ jobs:
           flutter-version: "3.x"
 
       - name: Flutter Pub Get
-        working-directory: ./FrontEnd
+        working-directory: ./Frontend
         run: flutter pub get
 
       - name: Flutter Analyze
-        working-directory: ./FrontEnd
+        working-directory: ./Frontend
         run: flutter analyze || true
 
-      # UPLOAD REPORTS
+      # UPLOAD
       - name: Upload SAST Reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -84,9 +83,10 @@ jobs:
             bandit-report.json
             semgrep-report.json
 
-  # ─────────────────────────────────────────
-  # SCA
-  # ─────────────────────────────────────────
+
+# ─────────────────────────────────────────
+# SCA
+# ─────────────────────────────────────────
   sca:
     name: SCA - Dependency Vulnerability Scan
     runs-on: ubuntu-latest
@@ -96,7 +96,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # PYTHON
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -106,15 +105,12 @@ jobs:
         run: pip install pip-audit
 
       - name: Run pip-audit
-        working-directory: ./BackEnd
+        working-directory: ./Backend
         run: |
-          pip-audit \
-          -r requirements.txt \
-          --format json \
-          > pip-audit-report.json || true
+          pip-audit -r requirements.txt --format json > pip-audit-report.json || true
 
       # TRIVY
-      - name: Run Trivy Filesystem Scan
+      - name: Run Trivy Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
@@ -122,19 +118,19 @@ jobs:
           format: "json"
           output: "trivy-report.json"
 
-      # UPLOAD REPORTS
       - name: Upload SCA Reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: sca-reports
           path: |
-            BackEnd/pip-audit-report.json
+            Backend/pip-audit-report.json
             trivy-report.json
 
-  # ─────────────────────────────────────────
-  # DOCKER BUILD
-  # ─────────────────────────────────────────
+
+# ─────────────────────────────────────────
+# DOCKER BUILD
+# ─────────────────────────────────────────
   docker:
     name: Docker Build Verification
     runs-on: ubuntu-latest
@@ -147,9 +143,10 @@ jobs:
       - name: Build Docker Containers
         run: docker compose build
 
-  # ─────────────────────────────────────────
-  # DAST
-  # ─────────────────────────────────────────
+
+# ─────────────────────────────────────────
+# DAST (FIXED PROPERLY)
+# ─────────────────────────────────────────
   dast:
     name: DAST - OWASP ZAP Scan
     runs-on: ubuntu-latest
@@ -169,11 +166,23 @@ jobs:
       - name: Start Containers
         run: docker compose up -d
 
-      - name: Wait for Startup
-        run: sleep 45
+      # ─────────────────────────────────────────
+      # REAL HEALTH CHECK (IMPORTANT FIX)
+      # ─────────────────────────────────────────
+      - name: Wait for Frontend to be Ready
+        run: |
+          echo "Waiting for frontend to respond on port 3000..."
+          for i in {1..30}; do
+            curl -s http://localhost:3000 > /dev/null && echo "Frontend is up!" && exit 0
+            echo "Not ready yet... retrying"
+            sleep 5
+          done
+          echo "Frontend failed to start"
+          docker logs frontend
+          exit 1
 
-      # REPORT FILES
-      - name: Pre-create ZAP Report Files
+      # ZAP REPORT FILES
+      - name: Prepare ZAP Reports
         run: |
           touch report_html.html report_json.json report_md.md
           chmod a+rw report_html.html report_json.json report_md.md
@@ -186,7 +195,6 @@ jobs:
           fail_action: false
           allow_issue_writing: false
           cmd_options: "-a"
-
         continue-on-error: true
 
       # UPLOAD REPORTS
@@ -199,5 +207,3 @@ jobs:
             report_html.html
             report_json.json
             report_md.md
-          if-no-files-found: warn
-
