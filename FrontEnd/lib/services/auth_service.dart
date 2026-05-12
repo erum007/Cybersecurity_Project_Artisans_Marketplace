@@ -3,9 +3,10 @@ import 'api_client.dart';
 
 class AuthResponse {
   final String token;
+  final String refreshToken;
   final UserModel user;
 
-  AuthResponse({required this.token, required this.user});
+  AuthResponse({required this.token, required this.refreshToken, required this.user});
 }
 
 class AuthService {
@@ -19,9 +20,11 @@ class AuthService {
       'password': password,
     });
     final token = (data['access_token'] ?? '').toString();
+    final refreshToken = (data['refresh_token'] ?? '').toString();
     api.token = token;
     return AuthResponse(
       token: token,
+      refreshToken: refreshToken,
       user: UserModel.fromJson(Map<String, dynamic>.from(data['user'] as Map)),
     );
   }
@@ -45,11 +48,48 @@ class AuthService {
       'city': city,
     });
     final token = (data['access_token'] ?? '').toString();
+    final refreshToken = (data['refresh_token'] ?? '').toString();
     api.token = token;
     return AuthResponse(
       token: token,
+      refreshToken: refreshToken,
       user: UserModel.fromJson(Map<String, dynamic>.from(data['user'] as Map)),
     );
+  }
+
+  Future<String?> refreshAccessToken(String refreshToken) async {
+    try {
+      final data = await api.postJson('/api/v1/auth/token/refresh', {
+        'refresh_token': refreshToken,
+      });
+      return (data['access_token'] ?? '').toString();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> logout([String? refreshToken]) async {
+    try {
+      final body = <String, dynamic>{};
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        body['refresh_token'] = refreshToken;
+      }
+      await api.postJson('/api/v1/auth/logout', body);
+    } catch (_) {
+      // best effort
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getSessions() async {
+    final res = await api.getJson('/api/v1/auth/sessions');
+    if (res is List) {
+      return List<Map<String, dynamic>>.from(res.map((item) => Map<String, dynamic>.from(item as Map)));
+    }
+    return [];
+  }
+
+  Future<void> revokeSession(String sessionId) async {
+    await api.deleteJson('/api/v1/auth/sessions/$sessionId');
   }
 
   Future<UserModel> updateMe(Map<String, dynamic> data) async {

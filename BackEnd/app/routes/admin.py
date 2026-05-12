@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from datetime import datetime, timezone
+from fastapi import APIRouter, Depends, HTTPException, status
 from bson import ObjectId
 
 from app.db.mongo import get_db
@@ -72,3 +73,51 @@ def artisan_revenue(_user=Depends(require_roles("admin"))):
     # Sort by revenue descending
     result.sort(key=lambda x: x["revenue"], reverse=True)
     return result
+
+
+@router.get("/users/{user_id}/sessions")
+def list_user_sessions(user_id: str, _user=Depends(require_roles("admin"))):
+    db = get_db()
+    try:
+        target_id = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    user = db.users.find_one({"_id": target_id})
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    sessions = []
+    for session in db.sessions.find({"user_id": user_id}).sort("created_at", -1):
+        sessions.append({
+            "id": str(session["_id"]),
+            "created_at": session["created_at"],
+            "expires_at": session["expires_at"],
+            "revoked": session.get("revoked", False),
+            "revoked_at": session.get("revoked_at"),
+        })
+    return sessions
+
+
+@router.delete("/users/{user_id}/sessions")
+def revoke_user_sessions(user_id: str, _user=Depends(require_roles("admin"))):
+    db = get_db()
+    try:
+        target_id = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    user = db.users.find_one({"_id": target_id})
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    now = datetime.now(timezone.utc)
+    result = db.sessions.update_many(
+        {"user_id": user_id, "revoked": False},
+        {"$set": {"revoked": True, "revoked_at": now}}
+    )
+    db.users.update_one({"_id": target_id}, {"$set": {"force_logout_at": now}})
+    return {
+        "message": "All sessions revoked",
+        "sessions_revoked": int(result.modified_count),
+    }

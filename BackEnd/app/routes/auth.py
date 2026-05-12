@@ -106,6 +106,12 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
+class SessionInfo(BaseModel):
+    id: str
+    created_at: datetime
+    expires_at: datetime
+
+
 # ─────────────────────────────────────────────────────────────
 # PASSWORD VALIDATION
 # ─────────────────────────────────────────────────────────────
@@ -202,6 +208,7 @@ def register(payload: UserCreate):
         "created_at": datetime.now(timezone.utc),
         "expires_at": datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
         "revoked": False,
+        "revoked_at": None,
     })
 
     return TokenResponse(
@@ -249,6 +256,7 @@ def login(payload: UserLogin):
         "created_at": datetime.now(timezone.utc),
         "expires_at": datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
         "revoked": False,
+        "revoked_at": None,
     })
 
     return TokenResponse(
@@ -288,21 +296,61 @@ def refresh_token(payload: RefreshRequest):
     return {"access_token": new_token, "token_type": "bearer"}
 
 
+@router.get("/sessions", response_model=list[SessionInfo])
+def list_sessions(user=Depends(get_current_user)):
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    sessions = []
+    for session in db.sessions.find({
+        "user_id": user["_id"],
+        "revoked": False,
+        "expires_at": {"$gt": now},
+    }).sort("created_at", -1):
+        sessions.append(SessionInfo(
+            id=str(session["_id"]),
+            created_at=session["created_at"],
+            expires_at=session["expires_at"],
+        ))
+    return sessions
+
+
+@router.delete("/sessions/{session_id}")
+def revoke_session(session_id: str, user=Depends(get_current_user)):
+    db = get_db()
+    try:
+        session_obj_id = ObjectId(session_id)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    session = db.sessions.find_one({"_id": session_obj_id, "user_id": user["_id"]})
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    db.sessions.update_one(
+        {"_id": session_obj_id},
+        {"$set": {"revoked": True, "revoked_at": datetime.now(timezone.utc)}}
+    )
+    return {"message": "Session revoked"}
+
+
 @router.post("/logout")
 def logout(payload: RefreshRequest | None = None, user=Depends(get_current_user)):
     db = get_db()
+    now = datetime.now(timezone.utc)
     if payload and payload.refresh_token:
         refresh_hash = hashlib.sha256(payload.refresh_token.encode()).hexdigest()
-        db.sessions.update_one(
+        result = db.sessions.update_one(
             {"refresh_token_hash": refresh_hash},
-            {"$set": {"revoked": True}}
+            {"$set": {"revoked": True, "revoked_at": now}}
         )
+        count = int(result.modified_count)
     else:
-        db.sessions.update_many(
-            {"user_id": user["_id"]},
-            {"$set": {"revoked": True}}
+        result = db.sessions.update_many(
+            {"user_id": str(user["_id"]), "revoked": False},
+            {"$set": {"revoked": True, "revoked_at": now}}
         )
-    return {"message": "Logged out successfully"}
+        count = int(result.modified_count)
+    return {"message": "Logged out successfully", "sessions_revoked": count}
 
 
 # ─────────────────────────────────────────────────────────────

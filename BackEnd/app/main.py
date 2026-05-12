@@ -9,14 +9,14 @@ from app.routes import admin, auth, cart, orders, products, uploads
 
 app = FastAPI(title=settings.app_name)
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # for development only
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 Path("uploads").mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 

@@ -16,6 +16,7 @@ def get_client() -> MongoClient:
 def ensure_session_indexes(db: Database) -> None:
     db.sessions.create_index("refresh_token_hash", unique=True)
     db.sessions.create_index("user_id")
+    db.sessions.create_index([("user_id", 1), ("revoked", 1)])
     db.sessions.create_index("expires_at", expireAfterSeconds=0)
 
 

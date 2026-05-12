@@ -47,13 +47,15 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # -------------------------
 
 def create_access_token(subject: str, extra_claims: dict[str, Any] | None = None) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(
+    now = datetime.now(timezone.utc)
+    expire = now + timedelta(
         minutes=settings.access_token_expire_minutes
     )
 
     to_encode: dict[str, Any] = {
         "sub": subject,
-        "exp": expire
+        "exp": expire,
+        "iat": now,
     }
 
     if extra_claims:
@@ -129,6 +131,27 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     user = db.users.find_one({"_id": ObjectId(user_id)})
     if user is None:
         raise credentials_exception
+
+    force_logout_at = user.get("force_logout_at")
+    issued_at = payload.get("iat")
+    if force_logout_at is not None and issued_at is not None:
+        if isinstance(issued_at, (int, float)):
+            issued_at_dt = datetime.fromtimestamp(issued_at, timezone.utc)
+        elif isinstance(issued_at, str):
+            issued_at_dt = datetime.fromisoformat(issued_at)
+        else:
+            issued_at_dt = issued_at
+
+        if isinstance(force_logout_at, str):
+            force_logout_at_dt = datetime.fromisoformat(force_logout_at)
+        else:
+            force_logout_at_dt = force_logout_at
+
+        if hasattr(force_logout_at_dt, "tzinfo") and force_logout_at_dt.tzinfo is None:
+            force_logout_at_dt = force_logout_at_dt.replace(tzinfo=timezone.utc)
+
+        if issued_at_dt < force_logout_at_dt:
+            raise credentials_exception
 
     user["_id"] = str(user["_id"])
     return user

@@ -286,6 +286,79 @@ class AccountSecurityScreen extends StatefulWidget {
 class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
   String? _email;
   String? _password;
+  bool _sessionLoading = false;
+  String? _sessionError;
+  List<Map<String, dynamic>> _sessions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSessions();
+    });
+  }
+
+  Future<void> _loadSessions() async {
+    setState(() {
+      _sessionLoading = true;
+      _sessionError = null;
+    });
+    try {
+      final state = context.read<AppState>();
+      final sessions = await state.authService.getSessions();
+      setState(() {
+        _sessions = sessions;
+      });
+    } catch (e) {
+      setState(() {
+        _sessionError = e.toString();
+      });
+    } finally {
+      setState(() {
+        _sessionLoading = false;
+      });
+    }
+  }
+
+  String _formatTimestamp(dynamic raw) {
+    if (raw == null) return 'Unknown';
+    try {
+      final date = DateTime.parse(raw.toString()).toLocal();
+      return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return raw.toString();
+    }
+  }
+
+  Future<void> _revokeSession(String sessionId) async {
+    final state = context.read<AppState>();
+    try {
+      await state.authService.revokeSession(sessionId);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Session revoked')));
+      }
+      await _loadSessions();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not revoke session: $e')));
+      }
+    }
+  }
+
+  Future<void> _revokeAllOtherSessions() async {
+    final state = context.read<AppState>();
+    try {
+      await state.authService.logout();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All sessions revoked')));
+      }
+      await _loadSessions();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not revoke sessions: $e')));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -352,8 +425,62 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                     if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
                   }
                 }),
+            const SizedBox(height: 24),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Active Sessions', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+            ),
+            const SizedBox(height: 10),
+            if (_sessionLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (_sessionError != null)
+              Text('Session error: $_sessionError', style: TextStyle(color: Colors.red.shade700))
+            else if (_sessions.isEmpty)
+              Text('No active sessions found.', style: TextStyle(color: Colors.grey.shade600))
+            else ...[
+              for (final session in _sessions)
+                Card(
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _formatTimestamp(session['created_at']),
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(height: 6),
+                              Text('Expires: ${_formatTimestamp(session['expires_at'])}', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                              const SizedBox(height: 4),
+                              if (_sessions.isNotEmpty && session['id'] == _sessions.first['id'])
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(color: Colors.green.shade100, borderRadius: BorderRadius.circular(12)),
+                                  child: Text('Current Session', style: TextStyle(color: Colors.green.shade800, fontSize: 11)),
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        TextButton(
+                          onPressed: () => _revokeSession(session['id'].toString()),
+                          child: const Text('Revoke'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
+              RedButton(
+                label: 'Revoke All Other Sessions',
+                onPressed: _revokeAllOtherSessions,
+              ),
+            ],
             const SizedBox(height: 16),
-
             ProfileSectionTile(
               icon: Icons.location_on_outlined,
               iconColor: Colors.orange,
