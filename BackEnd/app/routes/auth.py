@@ -71,14 +71,20 @@
 #     return UserPublic(**refreshed)
 
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import re
+from secrets import token_hex
+import hashlib
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 
+from app.core.config import settings
 from app.core.security import (
     create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
     get_current_user,
     get_password_hash,
     verify_password,
@@ -94,6 +100,10 @@ from app.models.user import (
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
 
 
 # ─────────────────────────────────────────────────────────────
@@ -184,8 +194,19 @@ def register(payload: UserCreate):
         {"role": payload.role}
     )
 
+    refresh_raw = token_hex(64)
+    refresh_hash = hashlib.sha256(refresh_raw.encode()).hexdigest()
+    db.sessions.insert_one({
+        "user_id": str(result.inserted_id),
+        "refresh_token_hash": refresh_hash,
+        "created_at": datetime.now(timezone.utc),
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
+        "revoked": False,
+    })
+
     return TokenResponse(
         access_token=token,
+        refresh_token=refresh_raw,
         user=UserPublic(**user_doc)
     )
 
@@ -220,10 +241,68 @@ def login(payload: UserLogin):
         {"role": user["role"]}
     )
 
+    refresh_raw = token_hex(64)
+    refresh_hash = hashlib.sha256(refresh_raw.encode()).hexdigest()
+    db.sessions.insert_one({
+        "user_id": user["_id"],
+        "refresh_token_hash": refresh_hash,
+        "created_at": datetime.now(timezone.utc),
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days),
+        "revoked": False,
+    })
+
     return TokenResponse(
         access_token=token,
+        refresh_token=refresh_raw,
         user=UserPublic(**user)
     )
+
+
+@router.post("/token/refresh")
+def refresh_token(payload: RefreshRequest):
+    db = get_db()
+    refresh_hash = hashlib.sha256(payload.refresh_token.encode()).hexdigest()
+    session = db.sessions.find_one({
+        "refresh_token_hash": refresh_hash,
+        "revoked": False,
+    })
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+    if session["expires_at"] <= datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+
+    user = db.users.find_one({"_id": ObjectId(session["user_id"])})
+    if not user or user.get("is_active") is False:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token"
+        )
+
+    new_token = create_access_token(session["user_id"], {"role": user["role"]})
+    return {"access_token": new_token, "token_type": "bearer"}
+
+
+@router.post("/logout")
+def logout(payload: RefreshRequest | None = None, user=Depends(get_current_user)):
+    db = get_db()
+    if payload and payload.refresh_token:
+        refresh_hash = hashlib.sha256(payload.refresh_token.encode()).hexdigest()
+        db.sessions.update_one(
+            {"refresh_token_hash": refresh_hash},
+            {"$set": {"revoked": True}}
+        )
+    else:
+        db.sessions.update_many(
+            {"user_id": user["_id"]},
+            {"$set": {"revoked": True}}
+        )
+    return {"message": "Logged out successfully"}
 
 
 # ─────────────────────────────────────────────────────────────

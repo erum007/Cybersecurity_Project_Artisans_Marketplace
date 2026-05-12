@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     jwt_secret: str = "change-me-in-production"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 40
+    refresh_token_expire_days: int = 7
+    refresh_token_secret: str = "change-me-refresh-secret"
     cors_origins: list[str] = ["*"]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

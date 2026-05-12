@@ -1,14 +1,13 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
+from secrets import token_hex
 
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-import hashlib
 from app.db.mongo import get_db
 
 from app.core.config import settings
-import hashlib
 from passlib.context import CryptContext
 
 # -------------------------
@@ -76,6 +75,36 @@ def decode_token(token: str) -> dict[str, Any]:
         )
     except JWTError:
         raise ValueError("Invalid token")
+
+
+def create_refresh_token(subject: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days)
+    to_encode: dict[str, Any] = {
+        "sub": subject,
+        "exp": expire,
+        "type": "refresh"
+    }
+    return jwt.encode(
+        to_encode,
+        settings.refresh_token_secret,
+        algorithm=settings.jwt_algorithm
+    )
+
+
+def decode_refresh_token(token: str) -> dict[str, Any]:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.refresh_token_secret,
+            algorithms=[settings.jwt_algorithm]
+        )
+    except JWTError:
+        raise ValueError("Invalid refresh token")
+
+    if payload.get("type") != "refresh":
+        raise ValueError("Not a refresh token")
+
+    return payload
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
