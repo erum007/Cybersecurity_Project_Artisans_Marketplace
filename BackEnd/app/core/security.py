@@ -8,21 +8,39 @@ import hashlib
 from app.db.mongo import get_db
 
 from app.core.config import settings
-
+import hashlib
+from passlib.context import CryptContext
 
 # -------------------------
 # PASSWORD HASHING (NO BCRYPT)
 # -------------------------
 
-def get_password_hash(password: str) -> str:
-    """
-    Fully stable hashing (NO bcrypt = NO 72-byte issues)
-    """
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+# def get_password_hash(password: str) -> str:
+#     """
+#     Fully stable hashing (NO bcrypt = NO 72-byte issues)
+#     """
+#     return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+
+# def verify_password(plain_password: str, hashed_password: str) -> bool:
+#     return get_password_hash(plain_password) == hashed_password
+
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto"
+)
+
+
+
+
+def get_password_hash(password: str):
+    # Truncate to 72 characters to satisfy bcrypt limits
+    return pwd_context.hash(password[:72])
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return get_password_hash(plain_password) == hashed_password
+    print("VERIFY INPUT:", repr(plain_password))
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 # -------------------------
