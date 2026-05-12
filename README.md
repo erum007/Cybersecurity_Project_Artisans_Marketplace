@@ -1,1 +1,1 @@
-Project for the Cybersecurity course at Habib University.
+Project for the Software Engineering course at Habib University.
