@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     mongo_db: str = "artisan-marketplace"
     jwt_secret: str = "change-me-in-production"
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60 * 24
+    access_token_expire_minutes: int = 40
     cors_origins: list[str] = ["*"]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
