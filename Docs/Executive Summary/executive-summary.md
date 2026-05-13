@@ -14,7 +14,7 @@ This security assessment covers the full application stack:
 Three classes of security testing were performed:
 1. **SAST (Static Application Security Testing):** Bandit and Semgrep for Python backend; flutter analyze for the frontend. Identifies insecure code patterns without running the application.
 2. **SCA (Software Composition Analysis):** pip-audit and Trivy to identify known CVEs in third-party dependencies.
-3. **DAST (Dynamic Application Security Testing):** OWASP ZAP baseline scan against the running containerized application, targeting the frontend on port 51235 and the API on port 8000.
+3. **DAST (Dynamic Application Security Testing):** OWASP ZAP scans against the running containerized application, targeting the frontend on port 51235 and the API on port 8000.
 
 ## Key Findings Summary
 
