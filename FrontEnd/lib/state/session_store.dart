@@ -6,17 +6,20 @@ import '../models/models.dart';
 
 class SessionStore {
   static const _tokenKey = 'session_token';
+  static const _refreshTokenKey = 'session_refresh_token';
   static const _userKey = 'session_user';
 
-  Future<void> save({required String token, required UserModel user}) async {
+  Future<void> save({required String token, required String refreshToken, required UserModel user}) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
+    await prefs.setString(_refreshTokenKey, refreshToken);
     await prefs.setString(_userKey, jsonEncode(user.toJson()));
   }
 
-  Future<({String? token, UserModel? user})> restore() async {
+  Future<({String? token, String? refreshToken, UserModel? user})> restore() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(_tokenKey);
+    final refreshToken = prefs.getString(_refreshTokenKey);
     final rawUser = prefs.getString(_userKey);
     UserModel? user;
     if (rawUser != null && rawUser.isNotEmpty) {
@@ -26,12 +29,13 @@ class SessionStore {
         user = null;
       }
     }
-    return (token: token, user: user);
+    return (token: token, refreshToken: refreshToken, user: user);
   }
 
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
+    await prefs.remove(_refreshTokenKey);
     await prefs.remove(_userKey);
   }
 }

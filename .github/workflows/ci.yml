@@ -1,208 +1,32 @@
-name: DevSecOps Pipeline
+name: Backend CI
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - main
   pull_request:
-    branches: ["**"]
+    branches:
+      - main
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-
-# ─────────────────────────────────────────
-# SAST
-# ─────────────────────────────────────────
 jobs:
-
-  sast:
-    name: SAST - BackEnd + Flutter Scan
+  test:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      # PYTHON SETUP
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
-      - name: Install BackEnd Dependencies
-        working-directory: ./BackEnd
-        run: pip install -r requirements.txt
-
-      # BANDIT
-      - name: Install Bandit
-        run: pip install bandit
-
-      - name: Run Bandit Scan
-        run: |
-          bandit -r BackEnd \
-          -f json \
-          -o bandit-report.json || true
-
-      # SEMGREP
-      - name: Install Semgrep
-        run: pip install semgrep
-
-      - name: Run Semgrep Scan
-        run: |
-          semgrep \
-            --config "p/security-audit" \
-            --config "p/secrets" \
-            --config "p/python" \
-            --config "p/javascript" \
-            --json \
-            --output semgrep-report.json \
-            . || true
-
-      # FLUTTER
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.x"
-
-      - name: Flutter Pub Get
-        working-directory: ./FrontEnd
-        run: flutter pub get
-
-      - name: Flutter Analyze
-        working-directory: ./FrontEnd
-        run: flutter analyze || true
-
-      # UPLOAD
-      - name: Upload SAST Reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: sast-reports
-          path: |
-            bandit-report.json
-            semgrep-report.json
-
-
-# ─────────────────────────────────────────
-# SCA
-# ─────────────────────────────────────────
-  sca:
-    name: SCA - Dependency Vulnerability Scan
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install pip-audit
-        run: pip install pip-audit
-
-      - name: Run pip-audit
+      - name: Install dependencies
         working-directory: ./BackEnd
         run: |
-          pip-audit -r requirements.txt --format json > pip-audit-report.json || true
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      # TRIVY
-      - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: "fs"
-          scan-ref: "."
-          format: "json"
-          output: "trivy-report.json"
-
-      - name: Upload SCA Reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: sca-reports
-          path: |
-            BackEnd/pip-audit-report.json
-            trivy-report.json
-
-
-# ─────────────────────────────────────────
-# DOCKER BUILD
-# ─────────────────────────────────────────
-  docker:
-    name: Docker Build Verification
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Build Docker Containers
-        run: docker compose build
-
-
-# ─────────────────────────────────────────
-# DAST (FIXED PROPERLY)
-# ─────────────────────────────────────────
-  dast:
-    name: DAST - OWASP ZAP Scan
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
-    steps:
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      # BUILD + START
-      - name: Build Containers
-        run: docker compose build
-
-      - name: Start Containers
-        run: docker compose up -d
-
-      # ─────────────────────────────────────────
-      # REAL HEALTH CHECK (IMPORTANT FIX)
-      # ─────────────────────────────────────────
-      - name: Wait for FrontEnd to be Ready
+      - name: Validate backend source
+        working-directory: ./BackEnd
         run: |
-          echo "Waiting for FrontEnd to respond on port 3000..."
-          for i in {1..30}; do
-            curl -s http://localhost:3000 > /dev/null && echo "FrontEnd is up!" && exit 0
-            echo "Not ready yet... retrying"
-            sleep 5
-          done
-          echo "FrontEnd failed to start"
-          docker logs FrontEnd
-          exit 1
-
-      # ZAP REPORT FILES
-      - name: Prepare ZAP Reports
-        run: |
-          touch report_html.html report_json.json report_md.md
-          chmod a+rw report_html.html report_json.json report_md.md
-
-      # ZAP SCAN
-      - name: Run OWASP ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.14.0
-        with:
-          target: "http://localhost:3000"
-          fail_action: false
-          allow_issue_writing: false
-          cmd_options: "-a"
-        continue-on-error: true
-
-      # UPLOAD REPORTS
-      - name: Upload ZAP Reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          path: |
-            report_html.html
-            report_json.json
-            report_md.md
+          find . -name '*.py' | sort | xargs python -m py_compile

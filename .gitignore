@@ -2,20 +2,21 @@
 /shelf/
 /workspace.xml
 
-# Docker SSL Keys
-artisan.key
-artisan.crt
-
-# Security: Sensitive Credentials
+# Security: Sensitive Credentials & Keys
 .env
 *.key
 *.crt
 *.pem
 
-# Python: Compiled files
+# Python: Compiled files & Cache
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+
+# Node dependencies
+node_modules/
 
 # IDEs and OS
 .idea/
@@ -25,9 +26,3 @@ Thumbs.db
 
 # Environment-specific
 docker-compose.override.yml
-
-# Python Cache
-**/__pycache__/
-*.pyc
-
-.env

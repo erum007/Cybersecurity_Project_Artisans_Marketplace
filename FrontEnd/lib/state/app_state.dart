@@ -423,6 +423,7 @@ static const String _baseUrl = String.fromEnvironment(
 
   UserModel? user;
   String? token;
+  String? refreshToken;
   bool isBusy = false;
   bool isBootstrapping = true;
   bool isUploadingImage = false;
@@ -448,29 +449,46 @@ static const String _baseUrl = String.fromEnvironment(
     try {
       final restored = await sessionStore.restore();
       token = restored.token;
+      refreshToken = restored.refreshToken;
       user = restored.user;
       api.token = token;
+      api.onTokenRefresh = _silentRefresh;
       if (isLoggedIn) {
         await refreshAll();
       }
     } catch (_) {
       await sessionStore.clear();
       token = null;
+      refreshToken = null;
       user = null;
       api.token = null;
+      api.onTokenRefresh = null;
     } finally {
       isBootstrapping = false;
       notifyListeners();
     }
   }
 
+  Future<String?> _silentRefresh() async {
+    if (refreshToken == null) return null;
+    final newToken = await authService.refreshAccessToken(refreshToken!);
+    if (newToken != null) {
+      token = newToken;
+      api.token = newToken;
+      await sessionStore.save(token: newToken, refreshToken: refreshToken!, user: user!);
+    }
+    return newToken;
+  }
+
   Future<void> login(String email, String password) async {
     await _run(() async {
       final result = await authService.login(email: email, password: password);
       token = result.token;
+      refreshToken = result.refreshToken;
       user = result.user;
       api.token = token;
-      await sessionStore.save(token: result.token, user: result.user);
+      api.onTokenRefresh = _silentRefresh;
+      await sessionStore.save(token: result.token, refreshToken: result.refreshToken, user: result.user);
       await refreshAll();
     });
   }
@@ -495,9 +513,11 @@ static const String _baseUrl = String.fromEnvironment(
         city: city,
       );
       token = result.token;
+      refreshToken = result.refreshToken;
       user = result.user;
       api.token = token;
-      await sessionStore.save(token: result.token, user: result.user);
+      api.onTokenRefresh = _silentRefresh;
+      await sessionStore.save(token: result.token, refreshToken: result.refreshToken, user: result.user);
       await refreshAll();
     });
   }
@@ -526,7 +546,7 @@ static const String _baseUrl = String.fromEnvironment(
         if (profilePicture != null) 'profile_picture': profilePicture,
       });
       user = updatedUser;
-      await sessionStore.save(token: token!, user: user!);
+      await sessionStore.save(token: token!, refreshToken: refreshToken ?? '', user: user!);
       notifyListeners();
     });
   }
@@ -555,7 +575,7 @@ static const String _baseUrl = String.fromEnvironment(
   Future<void> loadProfile() async {
     await _run(() async {
       user = await authService.getMe();
-      await sessionStore.save(token: token!, user: user!);
+      await sessionStore.save(token: token!, refreshToken: refreshToken ?? '', user: user!);
     }, silent: true);
   }
 
@@ -733,11 +753,14 @@ static const String _baseUrl = String.fromEnvironment(
   }
 
   Future<void> logout() async {
+    await authService.logout(refreshToken ?? '');
     isBusy = false;
     error = null;
     token = null;
+    refreshToken = null;
     user = null;
     api.token = null;
+    api.onTokenRefresh = null;
     products = [];
     sellerProducts = [];
     orders = [];

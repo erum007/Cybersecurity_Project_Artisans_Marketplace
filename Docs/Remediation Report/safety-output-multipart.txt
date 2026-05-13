@@ -1,0 +1,128 @@
+--- safety-output-multipart.txt ---
+{
+  "scan_target": "files",
+  "scanned": [
+    "BackEnd/requirements.txt"
+  ],
+  "scanned_full_path": [
+    "/home/roshaankhan/cybersecurity/project/Cybersecurity_Project_EduWild/BackEnd/requirements.txt"
+  ],
+  "target_languages": [
+    "python"
+  ],
+  "policy_file": null,
+  "policy_file_source": "local",
+  "audit_and_monitor": false,
+  "api_key": false,
+  "account": "",
+  "local_database_path": null,
+  "safety_version": "3.7.0",
+  "timestamp": "2026-05-13 12:17:30",
+  "packages_found": 10,
+  "vulnerabilities_found": 2,
+  "vulnerabilities_ignored": 0,
+  "remediations_recommended": 0,
+  "telemetry": {
+    "safety_options": {
+      "files": {
+        "--file": 1
+      },
+      "json": {
+        "--json": 1
+      }
+    },
+    "safety_version": "3.7.0",
+    "safety_source": "cli",
+    "os_type": "Linux",
+    "os_release": "6.6.114.1-microsoft-standard-WSL2",
+    "os_description": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python_version": "3.10.12",
+    "safety_command": "check"
+  },
+  "git": {
+    "branch": "fix/sca-python-multipart",
+    "tag": "",
+    "commit": "a3842f0889d008d5af0334436fd12bf4817e9836",
+    "dirty": "False",
+    "origin": "https://github.com/erum007/Cybersecurity_Project_Artisans_Marketplace.git"
+  },
+  "project": null,
+  "json_version": "1.1",
+  "remediations_attempted": 0,
+  "remediations_completed": 0,
+  "remediation_mode": "NON_INTERACTIVE"
+}
+
+Vulnerabilities:
+[
+  {
+    "vulnerability_id": "70716",
+    "package_name": "python-jose",
+    "ignored": {},
+    "ignored_reason": null,
+    "ignored_expires": null,
+    "vulnerable_spec": [
+      "<3.4.0"
+    ],
+    "all_vulnerable_specs": [
+      "<3.4.0"
+    ],
+    "analyzed_version": "3.3.0",
+    "analyzed_requirement": {
+      "raw": "python-jose[cryptography]==3.3.0",
+      "extras": [
+        "cryptography"
+      ],
+      "marker": null,
+      "name": "python-jose",
+      "specifier": "==3.3.0",
+      "url": null,
+      "found": "/home/roshaankhan/cybersecurity/project/Cybersecurity_Project_EduWild/BackEnd/requirements.txt"
+    },
+    "advisory": "Affected versions of Python-jose allow attackers to cause a denial of service (resource consumption) during a decode via a crafted JSON Web Encryption (JWE) token with a high compression ratio, aka a \"JWT bomb.\" This is similar to CVE-2024-21319.",
+    "is_transitive": false,
+    "published_date": null,
+    "fixed_versions": [],
+    "closest_versions_without_known_vulnerabilities": [],
+    "resources": [],
+    "CVE": "CVE-2024-33664",
+    "severity": null,
+    "affected_versions": [],
+    "more_info_url": "https://getsafety.com/v/70716/97c"
+  },
+  {
+    "vulnerability_id": "70715",
+    "package_name": "python-jose",
+    "ignored": {},
+    "ignored_reason": null,
+    "ignored_expires": null,
+    "vulnerable_spec": [
+      "<3.4.0"
+    ],
+    "all_vulnerable_specs": [
+      "<3.4.0"
+    ],
+    "analyzed_version": "3.3.0",
+    "analyzed_requirement": {
+      "raw": "python-jose[cryptography]==3.3.0",
+      "extras": [
+        "cryptography"
+      ],
+      "marker": null,
+      "name": "python-jose",
+      "specifier": "==3.3.0",
+      "url": null,
+      "found": "/home/roshaankhan/cybersecurity/project/Cybersecurity_Project_EduWild/BackEnd/requirements.txt"
+    },
+    "advisory": "Affected versions of Python-jose have a algorithm confusion vulnerability with OpenSSH ECDSA keys and other key formats. This is similar to CVE-2022-29217.",
+    "is_transitive": false,
+    "published_date": null,
+    "fixed_versions": [],
+    "closest_versions_without_known_vulnerabilities": [],
+    "resources": [],
+    "CVE": "CVE-2024-33663",
+    "severity": null,
+    "affected_versions": [],
+    "more_info_url": "https://getsafety.com/v/70715/97c"
+  }
+]
