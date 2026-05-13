@@ -202,10 +202,17 @@ jobs:
 
     steps:
 
+      # ─────────────────────────────────────
+      # CHECKOUT
+      # ─────────────────────────────────────
+
       - name: Checkout Repository
         uses: actions/checkout@v4
-    
-    # GENERATE TEMP SSL CERTS
+
+      # ─────────────────────────────────────
+      # GENERATE TEMP SSL CERTIFICATES
+      # ─────────────────────────────────────
+
       - name: Generate Self-Signed SSL Certificate
         run: |
           openssl req -x509 -nodes -days 1 \
@@ -214,20 +221,30 @@ jobs:
             -out artisan.crt \
             -subj "/CN=localhost"
 
-      # BUILD
+      # ─────────────────────────────────────
+      # BUILD CONTAINERS
+      # ─────────────────────────────────────
+
       - name: Build Containers
         run: docker compose build
 
-      # START
+      # ─────────────────────────────────────
+      # START CONTAINERS
+      # ─────────────────────────────────────
+
       - name: Start Containers
         run: docker compose up -d
 
+      # ─────────────────────────────────────
       # HEALTH CHECK
+      # ─────────────────────────────────────
+
       - name: Wait for FrontEnd to be Ready
         run: |
-          echo "Waiting for FrontEnd on port 3000..."
+          echo "Waiting for FrontEnd on HTTPS..."
 
           for i in {1..30}; do
+
             if curl -k -s https://localhost:443 > /dev/null; then
               echo "FrontEnd is ready!"
               exit 0
@@ -235,27 +252,36 @@ jobs:
 
             echo "Still starting..."
             sleep 5
+
           done
 
           echo "FrontEnd failed to start"
 
-          docker ps
+          docker compose ps
+
           docker logs FrontEnd || true
+          docker logs nginx || true
 
           exit 1
 
-      # PREPARE REPORTS
-      - name: Prepare ZAP Reports
+      # ─────────────────────────────────────
+      # PREPARE BASELINE REPORTS
+      # ─────────────────────────────────────
+
+      - name: Prepare Baseline Scan Reports
         run: |
-          touch report_html.html
-          touch report_json.json
-          touch report_md.md
+          touch baseline-report.html
+          touch baseline-report.json
+          touch baseline-report.md
 
-          chmod a+rw report_html.html
-          chmod a+rw report_json.json
-          chmod a+rw report_md.md
+          chmod a+rw baseline-report.html
+          chmod a+rw baseline-report.json
+          chmod a+rw baseline-report.md
 
-      # ZAP
+      # ─────────────────────────────────────
+      # ZAP BASELINE SCAN
+      # ─────────────────────────────────────
+
       - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
@@ -263,20 +289,78 @@ jobs:
           fail_action: false
           allow_issue_writing: false
           cmd_options: "-a"
+
+          report_html: baseline-report.html
+          report_json: baseline-report.json
+          report_md: baseline-report.md
+
         continue-on-error: true
 
-      # UPLOAD REPORTS
-      - name: Upload ZAP Reports
+      # ─────────────────────────────────────
+      # PREPARE API SCAN REPORTS
+      # ─────────────────────────────────────
+
+      - name: Prepare API Scan Reports
+        run: |
+          touch api-report.html
+          touch api-report.json
+          touch api-report.md
+
+          chmod a+rw api-report.html
+          chmod a+rw api-report.json
+          chmod a+rw api-report.md
+
+      # ─────────────────────────────────────
+      # ZAP API SCAN
+      # ─────────────────────────────────────
+
+      - name: Run OWASP ZAP API Scan
+        uses: zaproxy/action-api-scan@v0.9.0
+        with:
+          target: "https://localhost/openapi.json"
+          format: openapi
+          fail_action: false
+          allow_issue_writing: false
+          cmd_options: "-a"
+
+          report_html: api-report.html
+          report_json: api-report.json
+          report_md: api-report.md
+
+        continue-on-error: true
+
+      # ─────────────────────────────────────
+      # UPLOAD BASELINE REPORTS
+      # ─────────────────────────────────────
+
+      - name: Upload Baseline Scan Reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: dast-reports
+          name: baseline-scan-reports
           path: |
-            report_html.html
-            report_json.json
-            report_md.md
+            baseline-report.html
+            baseline-report.json
+            baseline-report.md
 
+      # ─────────────────────────────────────
+      # UPLOAD API SCAN REPORTS
+      # ─────────────────────────────────────
+
+      - name: Upload API Scan Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-scan-reports
+          path: |
+            api-report.html
+            api-report.json
+            api-report.md
+
+      # ─────────────────────────────────────
       # CLEANUP
+      # ─────────────────────────────────────
+
       - name: Stop Containers
         if: always()
         run: docker compose down
