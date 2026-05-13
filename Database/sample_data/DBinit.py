@@ -1,11 +1,9 @@
-
-
 import pymongo
 import json
 import os
 from datetime import datetime
 from bson import ObjectId
-
+from passlib.context import CryptContext
 
 # ----------------------------
 # CONNECTION
@@ -84,10 +82,21 @@ def init_db():
 # ----------------------------
 # SEED DATA
 # ----------------------------
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+   
 def seed():
 
     # USERS
     users = load_file("users.json")
+    raw_password = os.getenv("DEFAULT_USER_PASSWORD")
+
+    if not raw_password:
+        raise ValueError("CRITICAL SECURITY ERROR: 'DEFAULT_USER_PASSWORD' environment variable is not set.")
+
+    hashed_password = pwd_context.hash(raw_password)
+   
+    for user in users:
+        user["password_hash"] = hashed_password   # issue 13: Inject the hash dynamically so it's not hard-coded in the JSON
     db.users.insert_many(users)
     print(f"👤 Users: {len(users)}")
 
