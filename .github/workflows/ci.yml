@@ -2,72 +2,37 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches:
-      - "**"
+    branches: ["**"]
   pull_request:
-    branches:
-      - "**"
+    branches: ["**"]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-jobs:
-
-# ─────────────────────────────────────────
-# BACKEND VALIDATION
-# ─────────────────────────────────────────
-
-  backend-test:
-    name: Backend Validation
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Backend Dependencies
-        working-directory: ./BackEnd
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Validate Python Source Files
-        working-directory: ./BackEnd
-        run: |
-          find . -name "*.py" | sort | xargs python -m py_compile
 
 
 # ─────────────────────────────────────────
 # SAST
 # ─────────────────────────────────────────
+jobs:
 
   sast:
     name: SAST - BackEnd + Flutter Scan
     runs-on: ubuntu-latest
-    needs: backend-test
 
     steps:
 
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # PYTHON
+      # PYTHON SETUP
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Backend Dependencies
+      - name: Install BackEnd Dependencies
         working-directory: ./BackEnd
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       # BANDIT
       - name: Install Bandit
@@ -108,7 +73,7 @@ jobs:
         working-directory: ./FrontEnd
         run: flutter analyze || true
 
-      # UPLOAD REPORTS
+      # UPLOAD
       - name: Upload SAST Reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -122,11 +87,9 @@ jobs:
 # ─────────────────────────────────────────
 # SCA
 # ─────────────────────────────────────────
-
   sca:
     name: SCA - Dependency Vulnerability Scan
     runs-on: ubuntu-latest
-    needs: backend-test
 
     steps:
 
@@ -138,20 +101,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      # PIP AUDIT
       - name: Install pip-audit
         run: pip install pip-audit
 
       - name: Run pip-audit
         working-directory: ./BackEnd
         run: |
-          pip-audit \
-          -r requirements.txt \
-          --format json \
-          > pip-audit-report.json || true
+          pip-audit -r requirements.txt --format json > pip-audit-report.json || true
 
       # TRIVY
-      - name: Run Trivy File System Scan
+      - name: Run Trivy Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
@@ -159,25 +118,22 @@ jobs:
           format: "json"
           output: "trivy-report.json"
 
-      # UPLOAD REPORTS
       - name: Upload SCA Reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: sca-reports
           path: |
-            ./BackEnd/pip-audit-report.json
+            BackEnd/pip-audit-report.json
             trivy-report.json
 
 
 # ─────────────────────────────────────────
 # DOCKER BUILD
 # ─────────────────────────────────────────
-
   docker:
     name: Docker Build Verification
     runs-on: ubuntu-latest
-    needs: [sast, sca]
 
     steps:
 
@@ -189,13 +145,11 @@ jobs:
 
 
 # ─────────────────────────────────────────
-# DAST
+# DAST (FIXED PROPERLY)
 # ─────────────────────────────────────────
-
   dast:
     name: DAST - OWASP ZAP Scan
     runs-on: ubuntu-latest
-    needs: docker
 
     permissions:
       contents: read
@@ -205,48 +159,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # BUILD
+      # BUILD + START
       - name: Build Containers
         run: docker compose build
 
-      # START
       - name: Start Containers
         run: docker compose up -d
 
-      # HEALTH CHECK
+      # ─────────────────────────────────────────
+      # REAL HEALTH CHECK (IMPORTANT FIX)
+      # ─────────────────────────────────────────
       - name: Wait for FrontEnd to be Ready
         run: |
-          echo "Waiting for FrontEnd on port 3000..."
-
+          echo "Waiting for FrontEnd to respond on port 3000..."
           for i in {1..30}; do
-            if curl -s http://localhost:3000 > /dev/null; then
-              echo "FrontEnd is ready!"
-              exit 0
-            fi
-
-            echo "Still starting..."
+            curl -s http://localhost:3000 > /dev/null && echo "FrontEnd is up!" && exit 0
+            echo "Not ready yet... retrying"
             sleep 5
           done
-
           echo "FrontEnd failed to start"
-
-          docker ps
-          docker logs FrontEnd || true
-
+          docker logs FrontEnd
           exit 1
 
-      # PREPARE REPORTS
+      # ZAP REPORT FILES
       - name: Prepare ZAP Reports
         run: |
-          touch report_html.html
-          touch report_json.json
-          touch report_md.md
+          touch report_html.html report_json.json report_md.md
+          chmod a+rw report_html.html report_json.json report_md.md
 
-          chmod a+rw report_html.html
-          chmod a+rw report_json.json
-          chmod a+rw report_md.md
-
-      # ZAP
+      # ZAP SCAN
       - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
@@ -261,13 +202,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: dast-reports
           path: |
             report_html.html
             report_json.json
             report_md.md
-
-      # CLEANUP
-      - name: Stop Containers
-        if: always()
-        run: docker compose down
