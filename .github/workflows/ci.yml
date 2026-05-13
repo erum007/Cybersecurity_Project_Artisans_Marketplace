@@ -219,7 +219,7 @@ jobs:
           echo "Waiting for FrontEnd on port 3000..."
 
           for i in {1..30}; do
-            if curl -s http://localhost:3000 > /dev/null; then
+            if curl -s https://artisan.marketplace > /dev/null; then
               echo "FrontEnd is ready!"
               exit 0
             fi
@@ -250,7 +250,7 @@ jobs:
       - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
-          target: "http://localhost:3000"
+          target: "https://artisan.marketplace"
           fail_action: false
           allow_issue_writing: false
           cmd_options: "-a"
