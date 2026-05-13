@@ -81,11 +81,12 @@ class AuthService {
   }
 
   Future<List<Map<String, dynamic>>> getSessions() async {
-    final res = await api.getJson('/api/v1/auth/sessions');
-    if (res is List) {
-      return List<Map<String, dynamic>>.from(res.map((item) => Map<String, dynamic>.from(item as Map)));
+    final res = await api.getList('/api/v1/auth/sessions');
+    final sessions = <Map<String, dynamic>>[];
+    for (final item in res) {
+      sessions.add(Map<String, dynamic>.from(item as Map<String, dynamic>));
     }
-    return [];
+    return sessions;
   }
 
   Future<void> revokeSession(String sessionId) async {
