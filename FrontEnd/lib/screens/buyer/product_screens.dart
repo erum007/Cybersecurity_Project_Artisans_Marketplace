@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -66,7 +65,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Center(
                 child: Text(
                   ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!'][rating.toInt()],
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.starYellow,
