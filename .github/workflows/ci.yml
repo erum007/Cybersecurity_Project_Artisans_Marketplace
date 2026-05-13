@@ -204,6 +204,15 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v4
+    
+    # GENERATE TEMP SSL CERTS
+      - name: Generate Self-Signed SSL Certificate
+        run: |
+          openssl req -x509 -nodes -days 1 \
+            -newkey rsa:2048 \
+            -keyout artisan.key \
+            -out artisan.crt \
+            -subj "/CN=localhost"
 
       # BUILD
       - name: Build Containers
