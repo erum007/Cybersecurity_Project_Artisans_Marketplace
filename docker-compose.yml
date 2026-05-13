@@ -13,13 +13,13 @@ services:
     depends_on:
       - db
     environment:
-      - ENVIRONMENT=development
       - DATABASE_URL=mongodb://db:27017/
       - MONGO_DB=artisan-marketplace
       - JWT_SECRET=${JWT_SECRET} 
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
       - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
       - CORS_ORIGINS=${CORS_ORIGINS}
+      - ENVIRONMENT=development
       
     volumes:
       - ./BackEnd/uploads:/app/uploads
