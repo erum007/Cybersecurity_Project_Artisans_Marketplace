@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a comprehensive understanding of the static code analysis tools, methodology, and findings in the EduWild Cybersecurity Project. The analysis focuses on both **Source Code Analysis (SAST)** and **Supply Chain Analysis (SCA)** to identify and remediate security vulnerabilities.
+This document provides a comprehensive understanding of the static code analysis tools, methodology, and findings in the Artisans Marketplace Cybersecurity Project. The analysis focuses on both **Source Code Analysis (SAST)** and **Supply Chain Analysis (SCA)** to identify and remediate security vulnerabilities.
 
 ---
 
