@@ -6,8 +6,6 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  
-  
   backend:
     build: ./BackEnd
     ports:
@@ -17,18 +15,16 @@ services:
     environment:
       - DATABASE_URL=mongodb://db:27017/
       - MONGO_DB=artisan-marketplace
-      # Change 'ACCESS_TOKEN_SECRET' to 'JWT_SECRET' to match your Python class
       - JWT_SECRET=${JWT_SECRET} 
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
       - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
-      # You MUST add this line
       - CORS_ORIGINS=${CORS_ORIGINS}
+      
     volumes:
       - ./BackEnd/uploads:/app/uploads
 
   frontend:
     build: ./FrontEnd
-    # You can keep this port, but you will mostly use https://artisan.marketplace now
     ports:
       - "3000:80" 
     depends_on:
@@ -62,8 +58,7 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS}
       - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
     command: >
-      sh -c "pip install --default-timeout=100 pymongo passlib 'bcrypt==4.0.1' && python DBinit.py"
-  
+      sh -c "pip install --default-timeout=100 pymongo passlib 'bcrypt==4.0.1' && python DBinit.py"  
 
 volumes:
   mongo-data:
