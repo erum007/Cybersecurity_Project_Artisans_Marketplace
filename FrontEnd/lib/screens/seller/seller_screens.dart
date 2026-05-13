@@ -125,10 +125,10 @@ class _FinancesScreenState extends State<FinancesScreen> {
                         Container(
                           width: 38,
                           height: barH.clamp(4.0, 140.0),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: AppTheme.primaryRed,
                             borderRadius:
-                                const BorderRadius.vertical(top: Radius.circular(4)),
+                                BorderRadius.vertical(top: Radius.circular(4)),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -230,8 +230,7 @@ class _FinancesScreenState extends State<FinancesScreen> {
 class _SummaryCard extends StatelessWidget {
   final String title;
   final String amount;
-  final String? badge;
-  const _SummaryCard({required this.title, required this.amount, this.badge});
+  const _SummaryCard({required this.title, required this.amount});
 
   @override
   Widget build(BuildContext context) {
@@ -249,21 +248,6 @@ class _SummaryCard extends StatelessWidget {
                   color: Colors.white,
                   fontSize: 28,
                   fontWeight: FontWeight.w800)),
-          if (badge != null) ...[
-            const SizedBox(width: 8),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                  color: Colors.green.shade400,
-                  borderRadius: BorderRadius.circular(6)),
-              child: Text(badge!,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700)),
-            ),
-          ],
         ]),
       ]),
     );
@@ -726,27 +710,6 @@ class _ArtisanOrderCard extends StatelessWidget {
   }
 }
 
-// ── Status Chip ───────────────────────────────────────────────────────────────
-class _StatusChip extends StatelessWidget {
-  final String label;
-  final Color color;
-  const _StatusChip({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(label,
-          style: TextStyle(
-              color: color, fontSize: 11, fontWeight: FontWeight.w600)),
-    );
-  }
-}
-
 // ── Reviews Screen ─────────────────────────────────────────────────────────────
 class ReviewsScreen extends StatelessWidget {
   final List<Review>? reviews;
@@ -1122,7 +1085,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     ]),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: state.categories.contains(_category)
+                      initialValue: state.categories.contains(_category)
                           ? _category
                           : (state.categories.isNotEmpty
                               ? state.categories.first

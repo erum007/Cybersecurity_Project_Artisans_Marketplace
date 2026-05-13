@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,7 +5,6 @@ import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/widgets.dart';
 import '../../state/app_state.dart';
-import '../buyer/product_screens.dart';
 
 // Removed local _resolveImageUrl in favor of global resolveImageUrl from widgets.dart
 
@@ -334,14 +332,12 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
     final state = context.read<AppState>();
     try {
       await state.authService.revokeSession(sessionId);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Session revoked')));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Session revoked')));
       await _loadSessions();
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not revoke session: $e')));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not revoke session: $e')));
     }
   }
 
@@ -349,14 +345,12 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
     final state = context.read<AppState>();
     try {
       await state.authService.logout();
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All sessions revoked')));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All sessions revoked')));
       await _loadSessions();
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not revoke sessions: $e')));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not revoke sessions: $e')));
     }
   }
 
@@ -1166,7 +1160,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                             border: Border.all(color: AppTheme.primaryRed),
                                             borderRadius: BorderRadius.circular(20),
                                           ),
-                                          child: Text(
+                                          child: const Text(
                                             'Review',
                                             style: TextStyle(
                                               color: AppTheme.primaryRed,
