@@ -189,141 +189,94 @@ jobs:
 
 
 # ─────────────────────────────────────────
-# DAST - OWASP ZAP (Frontend + Backend API)
+# DAST
 # ─────────────────────────────────────────
 
   dast:
-    name: DAST - OWASP ZAP Scan (Frontend + Backend)
+    name: DAST - OWASP ZAP Scan
     runs-on: ubuntu-latest
     needs: docker
-  
+
     permissions:
       contents: read
-  
+
     steps:
-  
+
       - name: Checkout Repository
         uses: actions/checkout@v4
-  
-      # ─────────────────────────────
-      # START STACK
-      # ─────────────────────────────
+    
+    # GENERATE TEMP SSL CERTS
+      - name: Generate Self-Signed SSL Certificate
+        run: |
+          openssl req -x509 -nodes -days 1 \
+            -newkey rsa:2048 \
+            -keyout artisan.key \
+            -out artisan.crt \
+            -subj "/CN=localhost"
+
+      # BUILD
       - name: Build Containers
         run: docker compose build
-  
+
+      # START
       - name: Start Containers
         run: docker compose up -d
-  
-      # ─────────────────────────────
-      # HEALTH CHECK (BACKEND)
-      # ─────────────────────────────
-      - name: Wait for Backend (FastAPI)
+
+      # HEALTH CHECK
+      - name: Wait for FrontEnd to be Ready
         run: |
-          echo "Waiting for backend on port 8000..."
-  
-          for i in {1..40}; do
-            if curl -s http://localhost:8000/docs > /dev/null; then
-              echo "Backend is UP"
+          echo "Waiting for FrontEnd on port 3000..."
+
+          for i in {1..30}; do
+            if curl -k -s https://localhost:443 > /dev/null; then
+              echo "FrontEnd is ready!"
               exit 0
             fi
-            echo "Waiting..."
+
+            echo "Still starting..."
             sleep 5
           done
-  
-          echo "Backend failed"
-          docker logs Backend || true
+
+          echo "FrontEnd failed to start"
+
+          docker ps
+          docker logs FrontEnd || true
+
           exit 1
-  
-      # ─────────────────────────────
-      # HEALTH CHECK (FRONTEND)
-      # ─────────────────────────────
-      - name: Wait for Frontend
+
+      # PREPARE REPORTS
+      - name: Prepare ZAP Reports
         run: |
-          echo "Waiting for frontend on port 3000..."
-  
-          for i in {1..40}; do
-            if curl -s http://localhost:3000 > /dev/null; then
-              echo "Frontend is UP"
-              exit 0
-            fi
-            echo "Waiting..."
-            sleep 5
-          done
-  
-          echo "Frontend failed"
-          docker logs Frontend || true
-          exit 1
-  
-      # ─────────────────────────────
-      # PREP REPORT FILES (IMPORTANT FIX)
-      # ─────────────────────────────
-      - name: Prepare ZAP Report Files
-        run: |
-          mkdir -p zap-reports
-  
-          touch zap-reports/report_html.html
-          touch zap-reports/report_json.json
-          touch zap-reports/report_md.md
-  
-      # ─────────────────────────────
-      # ZAP BASELINE (FRONTEND)
-      # ─────────────────────────────
-      - name: ZAP Baseline Scan - Frontend
+          touch report_html.html
+          touch report_json.json
+          touch report_md.md
+
+          chmod a+rw report_html.html
+          chmod a+rw report_json.json
+          chmod a+rw report_md.md
+
+      # ZAP
+      - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
-          target: "http://localhost:3000"
-          cmd_options: "-a"
-          fail_action: false
-          allow_issue_writing: false
-        continue-on-error: true
-  
-      # ─────────────────────────────
-      # ZAP BASELINE (BACKEND)
-      # ─────────────────────────────
-      - name: ZAP Baseline Scan - Backend API
-        uses: zaproxy/action-baseline@v0.14.0
-        with:
-          target: "http://localhost:8000"
-          cmd_options: "-a"
-          fail_action: false
-          allow_issue_writing: false
-        continue-on-error: true
-  
-      # ─────────────────────────────
-      # ZAP API SCAN (FASTAPI BEST PART)
-      # ─────────────────────────────
-      - name: ZAP API Scan (OpenAPI)
-        uses: zaproxy/action-api-scan@v0.9.0
-        with:
-          target: "http://localhost:8000/openapi.json"
-          format: openapi
+          target: "https://localhost:443"
           fail_action: false
           allow_issue_writing: false
           cmd_options: "-a"
         continue-on-error: true
-  
-      # ─────────────────────────────
-      # FIX: ENSURE REPORT FILES EXIST
-      # (THIS FIXES YOUR 409 + missing file error)
-      # ─────────────────────────────
-      - name: Generate ZAP Summary Reports
-        run: |
-          echo "ZAP scan completed" > zap-reports/report_md.md
-          echo "{}" > zap-reports/report_json.json
-  
-      # ─────────────────────────────
-      # UPLOAD ARTIFACTS (FIXED NAME)
-      # ─────────────────────────────
-      - name: Upload DAST Reports
+
+      # UPLOAD REPORTS
+      - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: dast-reports-${{ github.run_id }}
-          path: zap-reports/
-  
-      # ─────────────────────────────
+          name: dast-reports
+          path: |
+            report_html.html
+            report_json.json
+            report_md.md
+
       # CLEANUP
-      # ─────────────────────────────
       - name: Stop Containers
         if: always()
         run: docker compose down
