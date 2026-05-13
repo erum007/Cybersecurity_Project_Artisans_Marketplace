@@ -114,6 +114,8 @@ APK will be at: `build/app/outputs/flutter-apk/app-release.apk`
 
 ---
 
+### Note: App can also be run on the web by exposing frontend and backend to different servers and then running in browser.
+
 ## 📦 Dependencies
 
 | Package | Purpose |
@@ -152,18 +154,13 @@ APK will be at: `build/app/outputs/flutter-apk/app-release.apk`
 
 ---
 
-## 🔧 Customization
-
-### Swap sample data for real API
-Replace `SampleData` in `lib/models/models.dart` with API calls via your preferred HTTP client (`http`, `dio`).
-
-### Add real images
-Replace `NetworkImage` URLs with `AssetImage` paths under `assets/images/` and update `pubspec.yaml` accordingly.
+## 🔧 Details
 
 ### User roles
-The app supports two roles out of the box:
+The app supports three roles:
 - **Buyer**: Home → Catalog → Product → Checkout
 - **Seller**: Finances → Manage Orders → Edit Products
+- **Admin**: View Dashboard With Metrics of Customer and Seller (number/amount earned)
 
 
 # Artisans Marketplace Backend
@@ -180,8 +177,7 @@ FastAPI + MongoDB backend for the artisan marketplace app.
 
 ## Run locally
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+cd Backend
 pip install -r requirements.txt
 cp .env.example .env
 uvicorn app.main:app --reload
@@ -195,6 +191,14 @@ uvicorn app.main:app --reload
 - Artisan screens -> `/api/v1/products`, `/api/v1/orders/artisan`
 - Admin portal -> build a small web panel against `/api/v1/admin/dashboard`
 
+## Run locally
+```bash
+cd Frontend
+flutter pub get (if not done)
+cp .env.example .env
+flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8000
+```
+
 ## Gaps still left for production
 - Payment gateway integration
 - Image uploads to S3 / Cloudinary
@@ -204,62 +208,15 @@ uvicorn app.main:app --reload
 ## Database Setup
 1. Ensure MongoDB Compass is running on your machine.
 2. Install dependencies: `pip install -r reqs.txt`
-3. Initialize the database through the python file
+3. Initialize the database through the python file in Database/sample_data/DBinit/py
 
-##  Import Data
-1. Enter mongodb://localhost:27017/ in browser address bar.
-2. Compass will open up and show the SE-Marketplace database that you created during the setup.
-3. Click on the name of any collection (Users, Artisans, Reviews, Products, Categories, Orders) and then the green + icon and click on "Import JSON or CSV file".
-4. Select the respective JSON file in the sample_data folder for the respective collection (artisans.json for Artisans collection and so on for all 6).
 
-# Artisans Marketplace - Added Session Persistence and Image Upload
+# Artisans Marketplace - Dockerized
+1. Clone repository.
+2. Navigate to project root.
+3. Run docker compose up -d
 
-## What was added
-- Persistent login using `shared_preferences`
-- Product image upload flow using Flutter `image_picker`
-- FastAPI multipart upload endpoint
-- Static file serving for uploaded product images
 
-## Backend setup
-```bash
-cd BackEnd
-python -m venv .venv
-source .venv/bin/activate (For git)
-.\.venv\Scripts\Activate.ps1 (For windows)
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-Uploaded images are stored in:
-- `BackEnd/uploads/`
-
-They are served from:
-<!-- - `http://<host>:8000/uploads/<filename>` -->
-[https://artisan.marketplace/uploads/]
-
-## Frontend setup
-```bash
-cd FrontEnd
-flutter pub get
-
-flutter run --dart-define=API_BASE_URL=[https://artisan.marketplace](https://artisan.marketplace)
-# flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
-```
-
-For a physical phone, replace `10.0.2.2` with your machine IP.
-
-## How product images work
-1. Artisan opens Add Product or Edit Product
-2. Tap **Pick product image**
-3. Choose image from gallery
-4. App uploads it to FastAPI
-5. Returned URL is saved into the product
-
-## Notes
-- Uploads currently allow JPG, JPEG, PNG, WEBP
-- Max upload size is 5 MB
-- Session restore uses locally stored token + user snapshot
-- For production, move uploads to S3 or Cloudinary and add token refresh
 
 
 
