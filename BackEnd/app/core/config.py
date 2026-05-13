@@ -1,13 +1,23 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+<<<<<<< HEAD
 from pydantic import field_validator, model_validator
 
+=======
+import os
+>>>>>>> main
 
 class Settings(BaseSettings):
     app_name: str = "Artisans Marketplace API"
     api_prefix: str = "/api/v1"
+<<<<<<< HEAD
     mongo_uri: str = "mongodb://localhost:27017"
     mongo_db: str = "artisan-marketplace"
     jwt_secret: str
+=======
+    mongo_uri: str = os.getenv("DATABASE_URL", "mongodb://db:27017/")
+    mongo_db: str = os.getenv("MONGO_DB", "artisan-marketplace")
+    jwt_secret: str = "change-me-in-production"
+>>>>>>> main
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 40
     refresh_token_expire_days: int = 7
@@ -49,3 +59,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

@@ -20,13 +20,16 @@ Uploaded images are stored in:
 - `BackEnd/uploads/`
 
 They are served from:
-- `http://<host>:8000/uploads/<filename>`
+<!-- - `http://<host>:8000/uploads/<filename>` -->
+[https://artisan.marketplace/uploads/]
 
 ## Frontend setup
 ```bash
 cd FrontEnd
 flutter pub get
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
+
+flutter run --dart-define=API_BASE_URL=[https://artisan.marketplace](https://artisan.marketplace)
+# flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
 For a physical phone, replace `10.0.2.2` with your machine IP.

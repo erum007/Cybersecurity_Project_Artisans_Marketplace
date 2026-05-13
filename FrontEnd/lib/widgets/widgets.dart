@@ -12,7 +12,9 @@ String resolveImageUrl(String url) {
   if (kIsWeb) return url;
   try {
     if (Platform.isAndroid) {
-      return url.replaceAll('127.0.0.1', '10.0.2.2').replaceAll('localhost', '10.0.2.2');
+      // return url.replaceAll('127.0.0.1', '10.0.2.2').replaceAll('localhost', '10.0.2.2');
+      return url.replaceAll('127.0.0.1', 'artisan.marketplace').replaceAll('localhost', 'artisan.marketplace');
+      
     }
   } catch (e) {
     // Platform.isAndroid might throw on web, though kIsWeb check should catch it
