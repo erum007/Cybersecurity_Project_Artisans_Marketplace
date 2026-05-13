@@ -1,4 +1,4 @@
-name: Backend CI
+name: CI with Static Analysis
 
 on:
   push:
@@ -30,3 +30,41 @@ jobs:
         working-directory: ./BackEnd
         run: |
           find . -name '*.py' | sort | xargs python -m py_compile
+
+      - name: Install static analysis tools
+        run: |
+          pip install ruff bandit
+
+      - name: Run Ruff (backend linting)
+        working-directory: ./BackEnd
+        run: |
+          ruff check --output-format=github-annotated . > ../ruff-report.txt || true
+
+      - name: Run Bandit (backend security scan)
+        working-directory: ./BackEnd
+        run: |
+          bandit -r . -f json -o ../bandit-report.json || true
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+
+      - name: Install Flutter dependencies
+        working-directory: ./FrontEnd
+        run: flutter pub get
+
+      - name: Run Flutter analyze (frontend linting)
+        working-directory: ./FrontEnd
+        run: |
+          flutter analyze --no-pub > ../flutter-report.txt || true
+
+      - name: Upload static analysis reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: static-analysis-reports
+          path: |
+            ruff-report.txt
+            bandit-report.json
+            flutter-report.txt
