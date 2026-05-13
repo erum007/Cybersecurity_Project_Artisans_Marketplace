@@ -13,6 +13,7 @@ services:
     depends_on:
       - db
     environment:
+      - ENVIRONMENT=development
       - DATABASE_URL=mongodb://db:27017/
       - MONGO_DB=artisan-marketplace
       - JWT_SECRET=${JWT_SECRET} 
