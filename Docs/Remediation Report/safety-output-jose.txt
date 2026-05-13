@@ -1,0 +1,124 @@
+--- safety-output-jose.txt ---
+{
+  "scan_target": "files",
+  "scanned": [
+    "BackEnd/requirements.txt"
+  ],
+  "scanned_full_path": [
+    "/home/roshaankhan/cybersecurity/project/Cybersecurity_Project_EduWild/BackEnd/requirements.txt"
+  ],
+  "target_languages": [
+    "python"
+  ],
+  "policy_file": null,
+  "policy_file_source": "local",
+  "audit_and_monitor": false,
+  "api_key": false,
+  "account": "",
+  "local_database_path": null,
+  "safety_version": "3.7.0",
+  "timestamp": "2026-05-13 12:19:59",
+  "packages_found": 10,
+  "vulnerabilities_found": 2,
+  "vulnerabilities_ignored": 0,
+  "remediations_recommended": 0,
+  "telemetry": {
+    "safety_options": {
+      "files": {
+        "--file": 1
+      },
+      "json": {
+        "--json": 1
+      }
+    },
+    "safety_version": "3.7.0",
+    "safety_source": "cli",
+    "os_type": "Linux",
+    "os_release": "6.6.114.1-microsoft-standard-WSL2",
+    "os_description": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python_version": "3.10.12",
+    "safety_command": "check"
+  },
+  "git": {
+    "branch": "fix/sca-python-jose",
+    "tag": "",
+    "commit": "1bd9f212acef348e294136eccb45b3fc8116ec94",
+    "dirty": "False",
+    "origin": "https://github.com/erum007/Cybersecurity_Project_Artisans_Marketplace.git"
+  },
+  "project": null,
+  "json_version": "1.1",
+  "remediations_attempted": 0,
+  "remediations_completed": 0,
+  "remediation_mode": "NON_INTERACTIVE"
+}
+
+Vulnerabilities:
+[
+  {
+    "vulnerability_id": "85155",
+    "package_name": "python-multipart",
+    "ignored": {},
+    "ignored_reason": null,
+    "ignored_expires": null,
+    "vulnerable_spec": [
+      "<0.0.22"
+    ],
+    "all_vulnerable_specs": [
+      "<0.0.22"
+    ],
+    "analyzed_version": "0.0.9",
+    "analyzed_requirement": {
+      "raw": "python-multipart==0.0.9",
+      "extras": [],
+      "marker": null,
+      "name": "python-multipart",
+      "specifier": "==0.0.9",
+      "url": null,
+      "found": "/home/roshaankhan/cybersecurity/project/Cybersecurity_Project_EduWild/BackEnd/requirements.txt"
+    },
+    "advisory": "Affected versions of the python-multipart package are vulnerable to Path Traversal due to unsafe filesystem path construction when preserving user-supplied upload filenames. When UPLOAD_DIR is configured and UPLOAD_KEEP_FILENAME=True, the upload-to-disk code builds the destination path with os.path.join(file_dir, fname) after the upload exceeds MAX_MEMORY_FILE_SIZE, allowing absolute-path filenames (for example, those starting with /) to override the intended base directory.",
+    "is_transitive": false,
+    "published_date": null,
+    "fixed_versions": [],
+    "closest_versions_without_known_vulnerabilities": [],
+    "resources": [],
+    "CVE": "CVE-2026-24486",
+    "severity": null,
+    "affected_versions": [],
+    "more_info_url": "https://getsafety.com/v/85155/97c"
+  },
+  {
+    "vulnerability_id": "74427",
+    "package_name": "python-multipart",
+    "ignored": {},
+    "ignored_reason": null,
+    "ignored_expires": null,
+    "vulnerable_spec": [
+      "<0.0.18"
+    ],
+    "all_vulnerable_specs": [
+      "<0.0.18"
+    ],
+    "analyzed_version": "0.0.9",
+    "analyzed_requirement": {
+      "raw": "python-multipart==0.0.9",
+      "extras": [],
+      "marker": null,
+      "name": "python-multipart",
+      "specifier": "==0.0.9",
+      "url": null,
+      "found": "/home/roshaankhan/cybersecurity/project/Cybersecurity_Project_EduWild/BackEnd/requirements.txt"
+    },
+    "advisory": "Affected versions of python-multipart are vulnerable to Allocation of Resources Without Limits or Throttling (CWE-770). An attacker can send specially crafted multipart/form-data requests containing excessive CR (\\r) or LF (\\n) characters before the first boundary or after the last boundary. This can lead to uncontrolled CPU usage and high memory consumption, causing the processing thread or event loop in ASGI applications to stall, resulting in a denial of service (DoS). The vulnerability exists in the MultipartParser's handling of line breaks around boundaries, where it processes each CRLF byte individually and logs warnings for each occurrence. To exploit this, an attacker simply needs to send large amounts of malformed multipart data with numerous CRLF characters. Upgrading to version 0.0.19 resolves this issue by preventing excessive resource allocation and logging when CRLF bytes are present.",
+    "is_transitive": false,
+    "published_date": null,
+    "fixed_versions": [],
+    "closest_versions_without_known_vulnerabilities": [],
+    "resources": [],
+    "CVE": "CVE-2024-53981",
+    "severity": null,
+    "affected_versions": [],
+    "more_info_url": "https://getsafety.com/v/74427/97c"
+  }
+]
