@@ -36,7 +36,7 @@ The **Artisans Marketplace** is a containerized, multi-tier web application desi
 
 ### Architecture Diagram
 
-![Architecture Diagram](./Architecture Diagram/ArchitectureDiagram.png)
+![Architecture Diagram](../Architecture%20Diagram/ArchitectureDiagram.png)
 
 
 ---

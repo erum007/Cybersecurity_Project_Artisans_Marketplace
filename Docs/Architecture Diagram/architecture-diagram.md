@@ -52,13 +52,10 @@ Rules enforced at this boundary:
 | **Admin Control** | Admin role | Full access to auth management (P1) and business operations (P2). Granted via role claim in JWT. |
 
 ---
--
 
 ##  Architecture Diagram
 
-``'
-![Architecture Diagram](./Architecture Diagram/ArchitectureDiagram.png)
-```
-
+![Architecture Diagram](./ArchitectureDiagram.png)
 ---
+
 
