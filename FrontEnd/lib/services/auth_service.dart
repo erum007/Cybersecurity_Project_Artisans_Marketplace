@@ -83,7 +83,8 @@ class AuthService {
   Future<List<Map<String, dynamic>>> getSessions() async {
     final res = await api.getJson('/api/v1/auth/sessions');
     if (res is List) {
-      return List<Map<String, dynamic>>.from(res.map((item) => Map<String, dynamic>.from(item as Map)));
+      return (res as List).map((item) => Map<String, dynamic>.from(item as Map)).toList();
+      // return List<Map<String, dynamic>>.from(res.map((item) => Map<String, dynamic>.from(item as Map)));
     }
     return [];
   }

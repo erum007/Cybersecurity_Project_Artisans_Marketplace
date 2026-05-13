@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 from bson import ObjectId
 from passlib.context import CryptContext
+from pymongo import UpdateOne
 
 # ----------------------------
 # CONNECTION
@@ -97,40 +98,80 @@ def seed():
    
     for user in users:
         user["password_hash"] = hashed_password   # issue 13: Inject the hash dynamically so it's not hard-coded in the JSON
-    db.users.insert_many(users)
-    print(f"👤 Users: {len(users)}")
+    # db.users.insert_many(users)
+    # print(f"👤 Users: {len(users)}")
+
+    
+
+    # Create a list of update operations
+    operations = [
+        UpdateOne(
+            {"email": user["email"]}, # Search by unique email
+            {"$set": user},           # Update with new data/hash
+            upsert=True               # Insert if email doesn't exist
+        ) for user in users
+    ]
+
+    # Execute all operations at once
+    result = db.users.bulk_write(operations)
+    print(f"👤 Users processed: {len(users)} (Upserted: {result.upserted_count}, Modified: {result.modified_count})")
 
     # PRODUCTS
     products = load_file("products.json")
-    db.products.insert_many(products)
-    print(f"🛍 Products: {len(products)}")
+
+
+    # Loading: products.json logic...
+    operations = [
+        UpdateOne(
+            {"_id": product["_id"]}, # Match by the unique ID
+            {"$set": product},       # Update the fields
+            upsert=True              # Create if it doesn't exist
+        ) for product in products
+    ]
+
+    result = db.products.bulk_write(operations)
+    print(f"📦 Products processed: {len(products)} (Upserted: {result.upserted_count}, Modified: {result.modified_count})")
+
 
     # CARTS (all string IDs)
     carts = load_file("carts.json")
 
+    cart_ops = []
     for c in carts:
         c["user_id"] = str(c["user_id"])
-
         for item in c.get("items", []):
             item["product_id"] = str(item["product_id"])
+        
+        # Use UpdateOne instead of insert_many
+        cart_ops.append(
+            UpdateOne({"_id": c["_id"]}, {"$set": c}, upsert=True)
+        )
 
-    db.carts.insert_many(carts)
-    print(f"🛒 Carts: {len(carts)}")
+    if cart_ops:
+        result = db.carts.bulk_write(cart_ops)
+        print(f"🛒 Carts processed: {len(carts)} (Upserted: {result.upserted_count}, Modified: {result.modified_count})")
+
 
     # ORDERS (UPDATED HERE)
     orders = load_file("orders.json")
 
-    for o in orders:
-        # string
-        o["customer_id"] = str(o["customer_id"])
+    orders = load_file("orders.json")
 
+    order_ops = []
+    for o in orders:
+        o["customer_id"] = str(o["customer_id"])
         for item in o.get("items", []):
             item["product_id"] = str(item["product_id"])
-            item["artisan_id"] = str(item["artisan_id"])  # ✅ FIXED
+            item["artisan_id"] = str(item["artisan_id"])
 
-    db.orders.insert_many(orders)
-    print(f"📦 Orders: {len(orders)}")
+        # Use UpdateOne instead of insert_many
+        order_ops.append(
+            UpdateOne({"_id": o["_id"]}, {"$set": o}, upsert=True)
+        )
 
+    if order_ops:
+        result = db.orders.bulk_write(order_ops)
+        print(f"📦 Orders processed: {len(orders)} (Upserted: {result.upserted_count}, Modified: {result.modified_count})")
 
 # ----------------------------
 # VERIFY
