@@ -5,6 +5,12 @@ Project for the Cybersecurity course at Habib University.
 A mobile ecommerce app connecting local artisans with buyers. Built with Flutter for Android.
 
 ---
+# Meet The Team
+
+Erum Naushad (Password strength validation, JWT token expiry, setting up ci.yml pipeline, DAST and setting up nginx config as a result, and completing relevant report sections.)
+Khadija Abbas (SAST, completing relevant report sections)
+Roshaan Khan (SCA, completing relevant report sections)
+---
 
 ## 📱 Screens Implemented
 
