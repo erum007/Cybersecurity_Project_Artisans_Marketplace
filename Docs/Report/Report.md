@@ -227,6 +227,14 @@ add_header Content-Security-Policy "
 ```nginx
 add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
 ```
+> **Note:** Initial fixes were too aggressive and prevented the app from functioning correctly. The final configuration above was determined after thorough testing to balance security and functionality.
+ 
+**Evidence — Aggressive Fixes (caused blank screen):**
+![Aggressive Fixes](../Remediation%20Report/Aggressive_Fixes.png)
+ 
+**Evidence — Accepted Risks (final working state):**
+![Accepted Risks](../Remediation%20Report/Accepted_Risks.png)
+ 
 
 ### 5.4 Residual Risk Justification (Accepted Risks)
 
