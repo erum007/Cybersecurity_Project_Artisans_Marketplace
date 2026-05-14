@@ -1,5 +1,38 @@
 # Artisans Marketplace: Comprehensive Security Assessment & Remediation Report
 
+# Table of Contents
+
+1. [Executive Summary](#1-executive-summary)
+   - 1.1 [Project Overview](#project-overview)
+   - 1.2 [Scope of Assessment](#scope-of-assessment)
+   - 1.3 [Assessment Activities](#assessment-activities)
+   - 1.4 [Overall Risk Rating](#overall-risk-rating)
+
+2. [Key Findings & Vulnerability Summary](#2-key-findings--vulnerability-summary)
+
+3. [Static Application Security Testing (SAST)](#3-static-application-security-testing-sast)
+   - 3.1 [Overview and Methodology](#31-overview-and-methodology)
+   - 3.2 [Summary of Findings](#32-summary-of-findings)
+   - 3.3 [Detailed SAST Remediation Highlights](#33-detailed-sast-remediation-highlights)
+
+4. [Software Composition Analysis (SCA)](#4-software-composition-analysis-sca)
+   - 4.1 [Workflow Validation](#41-workflow-validation)
+   - 4.2 [Dependency Vulnerabilities (Backend)](#42-dependency-vulnerabilities-backend)
+   - 4.3 [Fix Branches](#43-fix-branches)
+   - 4.4 [Frontend Dependency Status](#44-frontend-dependency-status)
+   - 4.5 [Screenshots & Evidence](#45-screenshots--evidence)
+
+5. [Dynamic Application Security Testing (DAST) & Exploitation](#5-dynamic-application-security-testing-dast--exploitation)
+   - 5.1 [OWASP ZAP Findings](#51-owasp-zap-findings)
+   - 5.2 [Possible Impact Summary](#52-possible-impact-summary)
+   - 5.3 [nginx Hardening (ZAP-Driven Remediation)](#53-nginx-hardening-zap-driven-remediation)
+   - 5.4 [Residual Risk Justification (Accepted Risks)](#54-residual-risk-justification-accepted-risks)
+   - 5.5 [Benefits of nginx Hardening](#55-benefits-of-nginx-hardening)
+
+6. [Remediation Implementation](#6-remediation-implementation)
+
+7. [Conclusion](#7-conclusion)
+
 ## 1. Executive Summary
 
 ### Project Overview
