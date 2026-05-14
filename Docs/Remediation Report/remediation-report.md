@@ -104,40 +104,40 @@ The Nginx reverse proxy was hardened to enforce modern security standards. The f
 
 ## 3. SECURITY HEADER SPECIFICS
 
-add_header X-Content-Type-Options "nosniff" always;
-add_header X-Frame-Options "SAMEORIGIN" always;
-add_header X-XSS-Protection "1; mode=block" always;
-add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+`add_header X-Content-Type-Options "nosniff" always;`
+`add_header X-Frame-Options "SAMEORIGIN" always;`
+`add_header X-XSS-Protection "1; mode=block" always;`
+`add_header Referrer-Policy "strict-origin-when-cross-origin" always;`
+`add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;`
 
 ---
 
 ## 4. CROSS-ORIGIN HARDENING
 
-add_header Cross-Origin-Opener-Policy "same-origin" always;
-add_header Cross-Origin-Embedder-Policy "require-corp" always;
-add_header Cross-Origin-Resource-Policy "same-origin" always;
+`add_header Cross-Origin-Opener-Policy "same-origin" always;`
+`add_header Cross-Origin-Embedder-Policy "require-corp" always;`
+`add_header Cross-Origin-Resource-Policy "same-origin" always;`
 
 ---
 
 ## 5. CSP (FINAL POLICY)
 
-add_header Content-Security-Policy "
-default-src 'self';
-script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://unpkg.com blob:;
-style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-connect-src 'self' https: wss:;
-img-src 'self' data: https: blob:;
-object-src 'none';
-base-uri 'self';
-frame-ancestors 'self';
-" always;
+`add_header Content-Security-Policy "`
+`default-src 'self';`
+`script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://unpkg.com blob:;`
+`style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;`
+`connect-src 'self' https: wss:;`
+`img-src 'self' data: https: blob:;`
+`object-src 'none';`
+`base-uri 'self';`
+`frame-ancestors 'self';`
+`" always;`
 
 ---
 
 ## 6. CACHE CONTROL
 
-add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
+`add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;`
 
 ---
 
