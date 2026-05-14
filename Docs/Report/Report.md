@@ -149,6 +149,13 @@ An audit using `flutter pub outdated` identified several packages requiring upda
 
 The full frontend outdated package report is available at `Docs/Remediation Report/flutter-outdated.txt`.
 
+### 4.5 Screenshots & Evidence
+ 
+The actual scanner outputs were saved as text artifacts in the remediation report directory and can be attached as evidence for the final report.
+ 
+- `Docs/Remediation Report/safety-output-multipart.txt`
+- `Docs/Remediation Report/safety-output-jose.txt`
+- `Docs/Remediation Report/flutter-outdated.txt`
 ---
 
 ## 5. Dynamic Application Security Testing (DAST) & Exploitation
