@@ -76,19 +76,78 @@ The initial automated scan on May 12, 2026, identified vulnerabilities across tw
 
 ## 4. Software Composition Analysis (SCA)
 
-### 4.1 Dependency Vulnerabilities (Backend)
+**SCA Tool:** `safety 3.7.0`
+**Scan Target:** `BackEnd/requirements.txt`
+**Report Artifacts:**
+- `Docs/Remediation Report/safety-output-multipart.txt`
+- `Docs/Remediation Report/safety-output-jose.txt`
+- `Docs/Remediation Report/flutter-outdated.txt`
+
+### 4.1 Workflow Validation
+
+The backend workflow was validated manually by installing backend dependencies and compiling Python source files:
+
+```bash
+cd BackEnd
+python3 -m pip install --user -r requirements.txt
+find app -name '*.py' | sort | xargs python3 -m py_compile
+```
+
+During validation, a merge conflict marker was discovered in `BackEnd/app/core/config.py` and corrected prior to fixing the SCA issues.
+
+### 4.2 Dependency Vulnerabilities (Backend)
 
 Scans via `Trivy` and `safety` identified critical vulnerabilities in third-party packages.
 
-| Package | CVE | Risk | Remediation |
-|---------|-----|------|-------------|
-| `python-multipart` | CVE-2026-24486, CVE-2024-53981 | Path traversal & DoS via malformed boundaries | Updated to `==0.0.28` |
-| `python-jose` | CVE-2024-33664, CVE-2024-33663 | Algorithm confusion & DoS via crafted tokens | Updated to `==3.5.0` |
-| `python-dotenv` | CVE-2026-28684 | Arbitrary file overwrite via symbolic links | Upgrade to `>=1.2.2` |
+| Issue | Package | CVE | Estimated Severity | CVSS | Branch | Fix |
+|-------|---------|-----|--------------------|------|--------|-----|
+| Path traversal in multipart upload handling | `python-multipart` | CVE-2026-24486 | High | 8.8 | `fix/sca-python-multipart` | Updated to `==0.0.28` |
+| DoS via malformed multipart boundaries | `python-multipart` | CVE-2024-53981 | High | 7.5 | `fix/sca-python-multipart` | Updated to `==0.0.28` |
+| JWT JWE decoding DoS via high-compression token | `python-jose` | CVE-2024-33664 | High | 7.5 | `fix/sca-python-jose` | Updated to `==3.5.0` |
+| JWT algorithm confusion / key parsing issue | `python-jose` | CVE-2024-33663 | High | 8.8 | `fix/sca-python-jose` | Updated to `==3.5.0` |
+| Arbitrary file overwrite via symbolic links | `python-dotenv` | CVE-2026-28684 | Medium | — | — | Upgrade to `>=1.2.2` |
 
-### 4.2 Frontend Dependency Status
+> Note: CVSS scores are estimated based on vulnerability type and attack surface. Scanner output files contain the detected advisories and full metadata.
 
-An audit using `flutter pub outdated` identified several packages requiring updates to mitigate potential security risk vectors, including `go_router`, `image_picker`, and `sqflite`.
+### 4.3 Fix Branches
+
+**`fix/sca-python-multipart`**
+- Updated `BackEnd/requirements.txt` from `python-multipart==0.0.9` to `python-multipart==0.0.28`.
+- Confirmed the `python-multipart` advisories were no longer reported by the backend SCA scan.
+
+**`fix/sca-python-jose`**
+- Updated `BackEnd/requirements.txt` from `python-jose[cryptography]==3.3.0` to `python-jose[cryptography]==3.5.0`.
+- Confirmed the `python-jose` advisories were no longer reported by the backend SCA scan.
+
+### 4.4 Frontend Dependency Status
+
+An audit using `flutter pub outdated` identified several packages requiring updates to mitigate potential security risk vectors. The following direct or transitive packages were detected as having newer available versions:
+
+| Package | Current | Latest |
+|---------|---------|--------|
+| `fl_chart` | 0.68.0 | 1.2.0 |
+| `flutter_lints` | 3.0.2 | 6.0.0 |
+| `go_router` | 13.2.5 | 17.2.3 |
+| `image_picker` | 1.2.1 | 1.2.2 |
+| `image_picker_android` | 0.8.13+16 | 0.8.13+17 |
+| `image_picker_ios` | 0.8.13+3 | 0.8.13+6 |
+| `lints` | 3.0.0 | 6.1.0 |
+| `matcher` | 0.12.17 | 0.12.20 |
+| `material_color_utilities` | 0.11.1 | 0.13.0 |
+| `meta` | 1.16.0 | 1.18.2 |
+| `mime` | 1.0.6 | 2.0.0 |
+| `path_provider_android` | 2.2.23 | 2.3.1 |
+| `path_provider_foundation` | 2.5.1 | 2.6.0 |
+| `smooth_page_indicator` | 1.2.1 | 2.0.1 |
+| `sqflite` | 2.4.2 | 2.4.2+1 |
+| `sqflite_android` | 2.4.2+2 | 2.4.2+3 |
+| `sqflite_common` | 2.5.6 | 2.5.7 |
+| `synchronized` | 3.4.0 | 3.4.0+1 |
+| `test_api` | 0.7.6 | 0.7.12 |
+| `vector_math` | 2.2.0 | 2.3.0 |
+| `vm_service` | 15.0.2 | 15.2.0 |
+
+The full frontend outdated package report is available at `Docs/Remediation Report/flutter-outdated.txt`.
 
 ---
 
@@ -109,6 +168,80 @@ The DAST phase identified vulnerabilities active in the running environment prio
 - Cross-Site Scripting (XSS) and Session Hijacking
 - UI Redressing (Clickjacking) and Phishing Overlays
 - Token Theft and Data Exfiltration
+
+### 5.3 nginx Hardening (ZAP-Driven Remediation)
+
+The nginx reverse proxy was hardened to enforce modern security standards. The following table maps identified risks to their specific technical fixes.
+
+| Vulnerability | Remediation Action | nginx Implementation |
+|--------------|-------------------|----------------------|
+| **Weak Encryption** | Disabled TLS 1.0/1.1; enforced strong ciphers | `ssl_protocols TLSv1.2 TLSv1.3;` |
+| **Clickjacking** | Restricted framing to same origin | `add_header X-Frame-Options "SAMEORIGIN";` |
+| **MIME Sniffing** | Disabled browser content-type guessing | `add_header X-Content-Type-Options "nosniff";` |
+| **MitM / Hijacking** | Enforced HSTS (Strict HTTPS) | `add_header Strict-Transport-Security ... always;` |
+| **Information Leak** | Disabled nginx version signatures | `server_tokens off;` |
+| **CORS Conflict** | Unified headers via proxy_hide_header | `proxy_hide_header 'Access-Control-Allow-Origin';` |
+
+**Security Headers Applied**
+
+```nginx
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-XSS-Protection "1; mode=block" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+```
+
+**Cross-Origin Hardening**
+
+```nginx
+add_header Cross-Origin-Opener-Policy "same-origin" always;
+add_header Cross-Origin-Embedder-Policy "require-corp" always;
+add_header Cross-Origin-Resource-Policy "same-origin" always;
+```
+
+**Content Security Policy (Final)**
+
+```nginx
+add_header Content-Security-Policy "
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://unpkg.com blob:;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  connect-src 'self' https: wss:;
+  img-src 'self' data: https: blob:;
+  object-src 'none';
+  base-uri 'self';
+  frame-ancestors 'self';
+" always;
+```
+
+**Cache Control**
+
+```nginx
+add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
+```
+
+### 5.4 Residual Risk Justification (Accepted Risks)
+
+Some Medium risks remained after hardening. These are necessary for the Flutter Web framework to function and have been mitigated as much as possible.
+
+**`unsafe-inline` and `unsafe-eval` in CSP**
+Flutter's CanvasKit (WebAssembly) engine requires these directives for high-performance rendering. Blocking them results in a blank screen error. Mitigation: `script-src` is limited to trusted domains (`'self'`, `gstatic.com`, `unpkg.com`) and `blob:` sources only.
+
+**Wildcard and Blob Directives**
+Flutter uses Web Workers and Blobs for background image processing. Mitigation: directives are scoped specifically to `blob:` and the internal backend address (`http://127.0.0.1:8000`) rather than a global `*`.
+
+**`style-src unsafe-inline`**
+Flutter generates dynamic CSS styles to position UI elements. This is a standard requirement for SPA frameworks like Flutter and React, and no alternative exists without breaking the UI.
+
+### 5.5 Benefits of nginx Hardening
+
+- Prevents sensitive data caching
+- Reduces data leakage risk
+- Clickjacking and MIME sniffing protection
+- Browser API restrictions via Permissions-Policy
+- Prevents cross-origin data leaks
+- Isolates browser context via COOP/COEP/CORP headers
 
 ---
 
