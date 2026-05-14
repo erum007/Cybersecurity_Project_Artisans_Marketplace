@@ -293,7 +293,7 @@ def refresh_token(payload: RefreshRequest):
         )
 
     new_token = create_access_token(session["user_id"], {"role": user["role"]})
-    return {"access_token": new_token, "token_type": "bearer"}
+    return {"access_token": new_token, "token_type": "bearer"} # nosec B105
 
 
 @router.get("/sessions", response_model=list[SessionInfo])
