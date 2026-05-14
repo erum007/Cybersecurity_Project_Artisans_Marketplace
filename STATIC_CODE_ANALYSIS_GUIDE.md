@@ -76,7 +76,7 @@ This document provides a comprehensive understanding of the static code analysis
   - Unused imports/variables
   - Deprecated API usage
 
-### Supply Chain Analysis (SCA)
+### Static Code Analysis (SCA)
 - **Focus**: Identifies vulnerabilities in third-party dependencies
 - **Tools in project**: pip-audit, Trivy
 - **Examples of findings**:
