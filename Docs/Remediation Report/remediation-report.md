@@ -1,5 +1,27 @@
 # Remediation Report
 
+# Table of Contents
+
+1. [Overview](#overview)
+2. [SAST Remediation (Semgrep & Bandit)](#sast-remediation-semgrep--bandit)
+   - 2.1 [Summary of Findings](#summary-of-findings)
+   - 2.2 [Detailed Findings & Remediation](#detailed-findings--remediation)
+3. [Workflow Validation](#workflow-validation)
+   - 3.1 [Vulnerabilities Found](#vulnerabilities-found)
+   - 3.2 [Fix Branches](#fix-branches)
+4. [Frontend Dependency Status](#frontend-dependency-status)
+5. [Screenshots and Evidence](#screenshots-and-evidence)
+6. [Nginx Hardening Based on ZAP Findings](#nginx-hardening-based-on-zap-findings)
+   - 6.1 [Remediation Overview](#remediation-overview)
+   - 6.2 [Resolved Vulnerabilities](#resolved-vulnerabilities)
+   - 6.3 [Security Header Specifics](#security-header-specifics)
+   - 6.4 [Cross-Origin Hardening](#cross-origin-hardening)
+   - 6.5 [CSP (Final Policy)](#csp-final-policy)
+   - 6.6 [Cache Control](#cache-control)
+   - 6.7 [Residual Risk Justification (Accepted Risks)](#residual-risk-justification-accepted-risks)
+7. [Benefits of Fixes](#benefits-of-fixes)
+8. [Conclusion](#conclusion)
+
 ## Overview
 
 This report documents the Software Composition Analysis (SCA) findings for the backend and frontend dependency state, the vulnerabilities discovered, and the applied remediation branches.
@@ -34,8 +56,6 @@ The automated scan identified following vulnerabilities.
 | V-07 | Use of Insecure SHA-1 Hash | A02: Cryptographic Failures | **Medium** | ✓ Resolved |
  
 ### Detailed Findings & Remediation
- 
----
  
 **V-01: Permissive Cross-Domain Policy (CORS Wildcard)**
 **Analysis:**
@@ -188,7 +208,7 @@ find app -name '*.py' | sort | xargs python3 -m py_compile
 
 During validation, a merge conflict marker was discovered in `BackEnd/app/core/config.py` and corrected prior to fixing the SCA issues.
 
-## Vulnerabilities Found
+### Vulnerabilities Found
 
 | Issue | Package | CVE | Estimated Severity | CVSS Mapping | Branch | Fix |
 |---|---|---|---|---|---|---|
@@ -199,7 +219,7 @@ During validation, a merge conflict marker was discovered in `BackEnd/app/core/c
 
 > Note: CVSS scores are estimated based on vulnerability type and attack surface. The scanner output files contain the detected advisories and full metadata.
 
-## Fix Branches
+### Fix Branches
 
 1. `fix/sca-python-multipart`
    - Updated `BackEnd/requirements.txt` from `python-multipart==0.0.9` to `python-multipart==0.0.28`.
@@ -240,20 +260,16 @@ The frontend outdated package report is available at `Docs/Remediation Report/fl
 
 ## Screenshots and Evidence
 
-The actual scanner outputs were saved as text artifacts in the remediation report directory. These can be converted to screenshots or attached as evidence for the final report.
-
 - `Docs/Remediation Report/safety-output-multipart.txt`
 - `Docs/Remediation Report/safety-output-jose.txt`
 - `Docs/Remediation Report/flutter-outdated.txt`
 
 ## NGINX HARDENING BASED ON ZAP FINDINGS
 
-## 1. Remediation Overview
+###  Remediation Overview
 The Nginx reverse proxy was hardened to enforce modern security standards. The following table maps the identified risks to their specific technical fixes.
 
----
-
-## 2. Resolved Vulnerabilities
+### Resolved Vulnerabilities
 
 | Vulnerability | Remediation Action | Nginx Implementation |
 | :--- | :--- | :--- |
@@ -264,9 +280,7 @@ The Nginx reverse proxy was hardened to enforce modern security standards. The f
 | **Information Leak** | Disabled Nginx version signatures | `server_tokens off;` |
 | **CORS Conflict** | Unified headers via `proxy_hide_header` | `proxy_hide_header 'Access-Control-Allow-Origin';` |
 
----
-
-## 3. SECURITY HEADER SPECIFICS
+### SECURITY HEADER SPECIFICS
 
 `add_header X-Content-Type-Options "nosniff" always;`
 `add_header X-Frame-Options "SAMEORIGIN" always;`
@@ -274,17 +288,13 @@ The Nginx reverse proxy was hardened to enforce modern security standards. The f
 `add_header Referrer-Policy "strict-origin-when-cross-origin" always;`
 `add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;`
 
----
-
-## 4. CROSS-ORIGIN HARDENING
+### CROSS-ORIGIN HARDENING
 
 `add_header Cross-Origin-Opener-Policy "same-origin" always;`
 `add_header Cross-Origin-Embedder-Policy "require-corp" always;`
 `add_header Cross-Origin-Resource-Policy "same-origin" always;`
 
----
-
-## 5. CSP (FINAL POLICY)
+### CSP (FINAL POLICY)
 
 `add_header Content-Security-Policy "`
 `default-src 'self';`
@@ -299,26 +309,22 @@ The Nginx reverse proxy was hardened to enforce modern security standards. The f
 
 At first, our fixes were too aggressive, and that prevented our app from properly functioning, this structure was determined after thorough testing and considering balance between security and functionality.
 
----
-
-## 6. CACHE CONTROL
+### CACHE CONTROL
 
 `add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;`
 
----
-
-## 7. Residual Risk Justification (Accepted Risks)
+### Residual Risk Justification (Accepted Risks)
 During the OWASP ZAP scan, some **Medium** risks remained. These are necessary for the **Flutter Web** framework to function and have been mitigated as much as possible.
 
-### 7.1 `unsafe-inline` and `unsafe-eval` in CSP
+#### `unsafe-inline` and `unsafe-eval` in CSP
 *   **Reason:** Flutter’s **CanvasKit (WebAssembly)** engine requires these for high-performance rendering. Blocking them results in a "Blank Screen" error.
 *   **Mitigation:** We have limited the `script-src` to trusted domains (`'self'`, `gstatic.com`, `unpkg.com`) and `blob:` sources only.
 
-### 7.2 Wildcard and Blob Directives
+#### Wildcard and Blob Directives
 *   **Reason:** Flutter uses **Web Workers** and **Blobs** for background image processing. 
 *   **Mitigation:** The directives are scoped specifically to `blob:` and your internal backend address (`http://127.0.0.1:8000`) rather than a global `*`.
 
-### 7.3 `style-src unsafe-inline`
+###$ `style-src unsafe-inline`
 *   **Reason:** Flutter generates dynamic CSS styles to position UI elements on the screen.
 *   **Mitigation:** This is a standard requirement for SPA (Single Page Application) frameworks like Flutter and React.
 
@@ -328,9 +334,7 @@ Aggressive Fixes:
 Accepted Risks:
 ![EndingReport](Accepted_Risks.png)
 
----
-
-## 8. Benefits of Fixes
+## Benefits of Fixes
 - Prevents sensitive caching
 - Reduces data leakage risk
 - Clickjacking protection
@@ -339,10 +343,5 @@ Accepted Risks:
 - Prevents cross-origin data leaks
 - Isolates browser context
 
----
-
-## 9. Conclusion
+## Conclusion
 The Artisan Marketplace is now compliant with modern web security best practices. All High-risk vulnerabilities have been eliminated, and remaining Medium-risk items have been documented as essential framework requirements with appropriate compensating controls.
-
-
-
