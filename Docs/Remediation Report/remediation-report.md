@@ -133,6 +133,8 @@ The Nginx reverse proxy was hardened to enforce modern security standards. The f
 `frame-ancestors 'self';`
 `" always;`
 
+At first, our fixes were too aggressive, and that prevented our app from properly functioning, this structure was determined after thorough testing and considering balance between security and functionality.
+
 ---
 
 ## 6. CACHE CONTROL
@@ -155,6 +157,12 @@ During the OWASP ZAP scan, some **Medium** risks remained. These are necessary f
 ### 7.3 `style-src unsafe-inline`
 *   **Reason:** Flutter generates dynamic CSS styles to position UI elements on the screen.
 *   **Mitigation:** This is a standard requirement for SPA (Single Page Application) frameworks like Flutter and React.
+
+Aggressive Fixes:
+![EndingReport1](./images/Aggressive_Fixes.png)
+
+Accepted Risks:
+![EndingReport](./images/Accepted_Risks.png)
 
 ---
 
