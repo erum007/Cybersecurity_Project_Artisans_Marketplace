@@ -30,7 +30,7 @@ The automated scan identified following vulnerabilities.
 | V-03 | Missing SSL Protocols (TLS) | A02: Cryptographic Failures | **Medium** | ✓ Fixed |
 | V-04 | Hardcoded Password String ('bearer') | A07: Identification & Auth Failures | **Low** | ✓ Resolved |
 | V-05 | Flask Debug Mode Enabled (False Positive) | A05: Security Misconfiguration | **Critical** | ✓ Resolved |
-| V-06 | Use of Insecure MD5 Hash | A02: Cryptographic Failures | **Medium** | Open |
+| V-06 | Use of Insecure MD5 Hash | A02: Cryptographic Failures | **Medium** | ✓ Resolved  |
 | V-07 | Use of Insecure SHA-1 Hash | A02: Cryptographic Failures | **Medium** | ✓ Resolved |
  
 ### Detailed Findings & Remediation
@@ -141,7 +141,7 @@ if os.getenv("ENVIRONMENT") == "production":
 ```
  
 **Verification:** FastAPI docs endpoints are disabled in production via environment-conditional logic.
-**Status:** ✓ Resolved (False Positive — Hardened Regardless)
+**Status:** ✓ Resolved (False Positive)
  
 ---
  
@@ -149,23 +149,11 @@ if os.getenv("ENVIRONMENT") == "production":
 **Analysis:**
 Semgrep detected usage of the MD5 hashing algorithm via `hashlib`. MD5 is cryptographically broken and susceptible to collision attacks, making it unsuitable for password hashing, integrity verification, or token generation.
  
-**Remediation (Pending):**
-Replace `hashlib.md5()` with `hashlib.sha256()` or `bcrypt` for password contexts.
- 
-```python
-# Before
-digest = hashlib.md5(data.encode()).hexdigest()
- 
-# After (general integrity)
-digest = hashlib.sha256(data.encode()).hexdigest()
- 
-# After (password context)
-import bcrypt
-hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-```
+**Remediation:**
+It was a commented code and is removed.
  
 **Verification:** Remediation pending. Upgrade path identified.
-**Status:** Open — Remediation Pending
+**Status:** ✓ Resolved (False Positive — Hardened Regardless)
  
 ---
  
