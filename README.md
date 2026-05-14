@@ -9,7 +9,7 @@ A mobile ecommerce app connecting local artisans with buyers. Built with Flutter
 
 ### Erum Naushad 
 ### Work Done:
-Password strength validation, JWT token expiry setup, setting up ci.yml pipeline, DAST and setting up nginx config as a result, and completing relevant report sections.
+Password strength validation, JWT token expiry setup, setting up ci.yml pipeline, DAST (through OWASP ZAP and ran baseline and API scans) and setting up nginx config as a result, and completing relevant report sections.
 
 ### Khadija Abbas 
 ### Work Done:
