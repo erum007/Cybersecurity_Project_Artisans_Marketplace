@@ -1,97 +1,268 @@
-server {
+name: DevSecOps Pipeline
 
-    listen 443 ssl;
-    server_name _;
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
 
-    # SSL CERTS
-    ssl_certificate /etc/nginx/ssl/artisan.crt;
-    ssl_certificate_key /etc/nginx/ssl/artisan.key;
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-    # Fixes 14: Insecure TLS Versions (Removes TLS 1.0/1.1)
-    ssl_protocols TLSv1.2 TLSv1.3;
+jobs:
 
-    # Tells the server to use its own strong ciphers instead of what the client asks for
-    ssl_prefer_server_ciphers on;
+# ─────────────────────────────────────────
+# BACKEND VALIDATION
+# ─────────────────────────────────────────
 
-    # This prevents 'Weak Cipher' flags in security scans
-    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-    # -----------------------------
+  backend-test:
+    name: Backend Validation
+    runs-on: ubuntu-latest
 
-    server_tokens off;
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    # -----------------------------
-    # FRONTEND ROUTING
-    # -----------------------------
-    location / {
-        proxy_pass http://frontend:80;
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      - name: Install Backend Dependencies
+        working-directory: ./BackEnd
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-        # SECURITY HEADERS
-        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-        add_header X-Content-Type-Options "nosniff" always;
-        add_header X-Frame-Options "SAMEORIGIN" always;
-        add_header X-XSS-Protection "1; mode=block" always;
-        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-        add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-        add_header Cross-Origin-Opener-Policy "same-origin" always;
-        add_header Cross-Origin-Embedder-Policy "require-corp" always;
-        add_header Cross-Origin-Resource-Policy "same-origin" always;
+      - name: Validate Python Source Files
+        working-directory: ./BackEnd
+        run: |
+          find . -name "*.py" | sort | xargs python -m py_compile
 
-        # THE COMPLETE FLUTTER CSP
-        add_header Content-Security-Policy "
-            default-src 'self';
-            script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.gstatic.com https://unpkg.com blob:;
-            script-src-elem 'self' 'unsafe-inline' https://www.gstatic.com https://unpkg.com blob:;
-            style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-            style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com;
-            img-src 'self' data: https: blob: http://127.0.0.1:8000;
-            img-src-elem 'self' data: https: blob: http://127.0.0.1:8000;
-            font-src 'self' data: https://fonts.gstatic.com;
-            connect-src 'self' https: wss: blob: http://127.0.0.1:8000;
-            worker-src 'self' blob:;
-            object-src 'none';
-            frame-src 'self' https:;
-            base-uri 'self';
-            form-action 'self';
-            frame-ancestors 'self';
-        " always;
 
-        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
-        add_header Pragma "no-cache" always;
-        add_header Expires "0" always;
-    }
+# ─────────────────────────────────────────
+# SAST
+# ─────────────────────────────────────────
 
-    # -----------------------------
-    # SERVE UPLOADED IMAGES (Cleaned CORS)
-    # -----------------------------
-    location /uploads/ {
-        proxy_pass http://backend:8000/uploads/;
-        
-        # 1. Hide the header coming from the backend to avoid duplicates
-        proxy_hide_header 'Access-Control-Allow-Origin';
-        
-        # 2. Add our own clean header
-        add_header 'Access-Control-Allow-Origin' 'https://artisan.marketplace' always;
-        add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS' always;
-        
-        proxy_set_header Host $host;
-    }
+  sast:
+    name: SAST - BackEnd + Flutter Scan
+    runs-on: ubuntu-latest
+    needs: backend-test
 
-    # -----------------------------
-    # BACKEND API ROUTING
-    # -----------------------------
-    location /api {
-        proxy_pass http://backend:8000;
-        proxy_set_header Host $host;
-        
-        # API SECURITY
-        add_header Content-Security-Policy "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';" always;
-    }
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    location ~ /\.(?!well-known) {
-        deny all;
-    }
-}
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Backend Dependencies
+        working-directory: ./BackEnd
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit Scan
+        run: |
+          bandit -r BackEnd \
+          -f json \
+          -o bandit-report.json || true
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep Scan
+        run: |
+          semgrep \
+            --config "p/security-audit" \
+            --config "p/secrets" \
+            --config "p/python" \
+            --config "p/javascript" \
+            --json \
+            --output semgrep-report.json \
+            . || true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+
+      - name: Flutter Pub Get
+        working-directory: ./FrontEnd
+        run: flutter pub get
+
+      - name: Flutter Analyze
+        working-directory: ./FrontEnd
+        run: flutter analyze || true
+
+      - name: Upload SAST Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sast-reports
+          path: |
+            bandit-report.json
+            semgrep-report.json
+
+
+# ─────────────────────────────────────────
+# SCA
+# ─────────────────────────────────────────
+
+  sca:
+    name: SCA - Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    needs: backend-test
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run pip-audit
+        working-directory: ./BackEnd
+        run: |
+          pip-audit \
+          -r requirements.txt \
+          --format json \
+          > pip-audit-report.json || true
+
+      - name: Run Trivy File System Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "json"
+          output: "trivy-report.json"
+
+      - name: Upload SCA Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sca-reports
+          path: |
+            ./BackEnd/pip-audit-report.json
+            trivy-report.json
+
+
+# ─────────────────────────────────────────
+# DOCKER BUILD
+# ─────────────────────────────────────────
+
+  docker:
+    name: Docker Build Verification
+    runs-on: ubuntu-latest
+    needs: [sast, sca]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker Containers
+        run: docker compose build
+
+
+# ─────────────────────────────────────────
+# DAST
+# ─────────────────────────────────────────
+
+  dast:
+    name: DAST - OWASP ZAP Scan
+    runs-on: ubuntu-latest
+    needs: docker
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate Self-Signed SSL Certificate
+        run: |
+          openssl req -x509 -nodes -days 1 \
+            -newkey rsa:2048 \
+            -keyout artisan.key \
+            -out artisan.crt \
+            -subj "/CN=localhost"
+
+      - name: Build Containers
+        run: docker compose build
+
+      - name: Start Containers
+        run: docker compose up -d
+
+      - name: Wait for FrontEnd to be Ready
+        run: |
+          echo "Waiting for FrontEnd on port 443..."
+
+          for i in {1..30}; do
+            if curl -k -s https://localhost:443 > /dev/null; then
+              echo "FrontEnd is ready!"
+              exit 0
+            fi
+            echo "Still starting..."
+            sleep 5
+          done
+
+          echo "FrontEnd failed to start"
+          docker ps
+          docker logs FrontEnd || true
+          exit 1
+
+      # ─────────────────────────────
+      # API SCAN (FASTAPI FIXED)
+      # ─────────────────────────────
+      - name: Run OWASP ZAP API Scan
+        uses: zaproxy/action-api-scan@v0.7.0
+        with:
+          target: "https://localhost:443/api/openapi.json"
+          fail_action: false
+        continue-on-error: true
+
+      - name: Prepare ZAP Reports
+        run: |
+          touch report_html.html
+          touch report_json.json
+          touch report_md.md
+          chmod a+rw report_html.html
+          chmod a+rw report_json.json
+          chmod a+rw report_md.md
+
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: "https://localhost:443"
+          fail_action: false
+          allow_issue_writing: false
+          cmd_options: "-a"
+        continue-on-error: true
+
+      - name: Upload ZAP Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dast-reports
+          path: |
+            report_html.html
+            report_json.json
+            report_md.json
+            report_md.md
+
+      - name: Stop Containers
+        if: always()
+        run: docker compose down
