@@ -12,6 +12,186 @@ This report documents the Software Composition Analysis (SCA) findings for the b
   - `Docs/Remediation Report/safety-output-jose.txt`
   - `Docs/Remediation Report/flutter-outdated.txt`
 
+ 
+## SAST Remediation (Semgrep & Bandit)
+ 
+Our DevSecOps pipeline integrates Semgrep and Bandit to automate detection of security flaws in the source code. Semgrep was used to scan for framework-specific vulnerabilities (FastAPI) and configuration errors (Nginx), while Bandit provided deep analysis of Python-specific risks.
+ 
+The pipeline serves as a Quality Gate: any commit that introduces a High or Critical vulnerability automatically fails the CI/CD build, preventing insecure code from reaching production.
+ 
+### Summary of Findings
+ 
+The automated scan identified following vulnerabilities. 
+ 
+| ID | Vulnerability | OWASP 2021 Category | Severity | Status |
+|----|---------------|---------------------|----------|--------|
+| V-01 | Wildcard CORS Policy | A05: Security Misconfiguration | **Medium** | ✓ Fixed |
+| V-02 | Hardcoded Bcrypt Hashes | A07: Identification & Auth Failures | **High** | ✓ Fixed |
+| V-03 | Missing SSL Protocols (TLS) | A02: Cryptographic Failures | **Medium** | ✓ Fixed |
+| V-04 | Hardcoded Password String ('bearer') | A07: Identification & Auth Failures | **Low** | ✓ Resolved |
+| V-05 | Flask Debug Mode Enabled (False Positive) | A05: Security Misconfiguration | **Critical** | ✓ Resolved |
+| V-06 | Use of Insecure MD5 Hash | A02: Cryptographic Failures | **Medium** | Open |
+| V-07 | Use of Insecure SHA-1 Hash | A02: Cryptographic Failures | **Medium** | Open |
+ 
+### Detailed Findings & Remediation
+ 
+---
+ 
+**V-01: Permissive Cross-Domain Policy (CORS Wildcard)**
+**Analysis:**
+The application used a wildcard `*` for `allow_origins`. This allows any malicious website to interact with the backend, bypassing the Same-Origin Policy (SOP) and enabling cross-site request forgery attacks.
+ 
+**Remediation:**
+Transitioned to a whitelist approach. The configuration was updated to only permit requests from the specific frontend domain.
+ 
+```python
+# Before
+app.add_middleware(CORSMiddleware, allow_origins=["*"], ...)
+ 
+# After
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
+)
+```
+ 
+**Verification:** Fix pushed via Issue #1 and verified through a successful pipeline re-run.
+**Status:** ✓ Fixed
+ 
+---
+ 
+**V-02: Hardcoded Credentials (Bcrypt Hashes in Source Control)**
+**Analysis:**
+Semgrep detected hardcoded bcrypt hashes in the user data file. Storing secrets — even hashed ones — in source control exposes credentials if the repository is leaked or publicly accessible.
+ 
+**Remediation:**
+All static hashes were removed from the repository. The application now uses environment variables to seed the database securely during the build process.
+ 
+```python
+# Before — static hashes committed to users.json
+{ "password": "$2b$12$hardcodedHashValue..." }
+ 
+# After — dynamic seeding via environment variable
+import os, bcrypt
+password = os.environ["SEED_USER_PASSWORD"]
+hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+```
+ 
+**Verification:** Fix pushed via Issue #2.
+**Status:** ✓ Fixed
+ 
+---
+ 
+**V-03: Inadequate Encryption Strength (Missing TLS Protocol Directives)**
+**Analysis:**
+The Nginx server was missing the `ssl_protocols` directive, causing it to default to older broken protocol versions including TLSv1 and TLSv1.1, which are vulnerable to BEAST and POODLE attacks.
+ 
+**Remediation:**
+The `nginx.conf` was hardened to explicitly require TLSv1.2 and TLSv1.3 only.
+ 
+```nginx
+# Before — no ssl_protocols directive (defaults to insecure versions)
+ 
+# After
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+ssl_prefer_server_ciphers off;
+```
+ 
+**Verification:** Fix pushed via Issue #3 and satisfies the project's HTTPS requirement.
+**Status:** ✓ Fixed
+ 
+---
+ 
+**V-04: Use of Hardcoded Password String ('bearer')**
+**Analysis:**
+Bandit flagged the string `'bearer'` as a potential hardcoded credential. It is a standard OAuth2 token type identifier and not a sensitive secret, but warrants documentation.
+ 
+**Remediation:**
+Verified as a static OAuth2 token type descriptor. A `# nosec` comment with justification was added to suppress the false-positive warning.
+ 
+```python
+# After
+token_type = "bearer"  # nosec B105 — standard OAuth2 token type, not a credential
+```
+ 
+**Verification:** Suppressed via `#nosec` annotation with inline justification.
+**Status:** ✓ Resolved (False Positive)
+ 
+---
+ 
+**V-05: Flask Debug Mode Enabled (Tool False Positive — FastAPI Application)**
+**Analysis:**
+Semgrep flagged the application as having Flask debug mode enabled. The application is built on FastAPI, not Flask — this was a false positive due to pattern matching on a non-Flask codebase. The underlying concern about debug exposure in production was still treated seriously.
+ 
+**Remediation:**
+`main.py` was updated to programmatically disable `/docs`, `/redoc`, and `/openapi.json` endpoints when `ENVIRONMENT` is set to `production`.
+ 
+```python
+# After
+import os
+ 
+if os.getenv("ENVIRONMENT") == "production":
+    app.openapi_url = None  # disables /openapi.json
+    app.docs_url    = None  # disables /docs
+    app.redoc_url   = None  # disables /redoc
+```
+ 
+**Verification:** FastAPI docs endpoints are disabled in production via environment-conditional logic.
+**Status:** ✓ Resolved (False Positive — Hardened Regardless)
+ 
+---
+ 
+**V-06: Use of Insecure MD5 Hash**
+**Analysis:**
+Semgrep detected usage of the MD5 hashing algorithm via `hashlib`. MD5 is cryptographically broken and susceptible to collision attacks, making it unsuitable for password hashing, integrity verification, or token generation.
+ 
+**Remediation (Pending):**
+Replace `hashlib.md5()` with `hashlib.sha256()` or `bcrypt` for password contexts.
+ 
+```python
+# Before
+digest = hashlib.md5(data.encode()).hexdigest()
+ 
+# After (general integrity)
+digest = hashlib.sha256(data.encode()).hexdigest()
+ 
+# After (password context)
+import bcrypt
+hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+```
+ 
+**Verification:** Remediation pending. Upgrade path identified.
+**Status:** Open — Remediation Pending
+ 
+---
+ 
+**V-07: Use of Insecure SHA-1 Hash**
+**Analysis:**
+SHA-1 hashing was detected via Semgrep. SHA-1 is deprecated by NIST and no longer secure against modern collision attacks.
+ 
+**Remediation (Pending):**
+Upgrade all SHA-1 usages to SHA-256 or higher. For authenticated integrity, use HMAC-SHA-256.
+ 
+```python
+# Before
+digest = hashlib.sha1(data.encode()).hexdigest()
+ 
+# After (general integrity)
+digest = hashlib.sha256(data.encode()).hexdigest()
+ 
+# After (authenticated integrity)
+import hmac
+digest = hmac.new(secret.encode(), data.encode(), hashlib.sha256).hexdigest()
+```
+ 
+**Verification:** Remediation pending. Target: replace `hashlib.sha1()` with `hashlib.sha256()` across all call sites.
+**Status:** Open — Remediation Pending
+ 
+---
 ## Workflow Validation
 
 The backend workflow was validated manually by installing backend dependencies and compiling Python source files:
