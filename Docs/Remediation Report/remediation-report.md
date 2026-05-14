@@ -161,10 +161,10 @@ During the OWASP ZAP scan, some **Medium** risks remained. These are necessary f
 ## 8. Benefits of Fixes
 - Prevents sensitive caching
 - Reduces data leakage risk
-- - Clickjacking protection
+- Clickjacking protection
 - MIME sniffing protection
 - Browser API restrictions
-- - Prevents cross-origin data leaks
+- Prevents cross-origin data leaks
 - Isolates browser context
 
 ---
