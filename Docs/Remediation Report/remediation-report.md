@@ -159,10 +159,10 @@ During the OWASP ZAP scan, some **Medium** risks remained. These are necessary f
 *   **Mitigation:** This is a standard requirement for SPA (Single Page Application) frameworks like Flutter and React.
 
 Aggressive Fixes:
-![EndingReport1](images/Aggressive_Fixes.png)
+![EndingReport1](../images/Aggressive_Fixes.png)
 
 Accepted Risks:
-![EndingReport](images/Accepted_Risks.png)
+![EndingReport](../images/Accepted_Risks.png)
 
 ---
 
