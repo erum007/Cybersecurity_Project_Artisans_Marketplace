@@ -19,6 +19,7 @@ services:
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
       - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
       - CORS_ORIGINS=${CORS_ORIGINS}
+      - ENVIRONMENT=development
       
     volumes:
       - ./BackEnd/uploads:/app/uploads

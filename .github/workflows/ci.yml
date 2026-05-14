@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -53,11 +52,9 @@ jobs:
     needs: backend-test
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # PYTHON
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -69,7 +66,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # BANDIT
       - name: Install Bandit
         run: pip install bandit
 
@@ -79,7 +75,6 @@ jobs:
           -f json \
           -o bandit-report.json || true
 
-      # SEMGREP
       - name: Install Semgrep
         run: pip install semgrep
 
@@ -94,7 +89,6 @@ jobs:
             --output semgrep-report.json \
             . || true
 
-      # FLUTTER
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -108,7 +102,6 @@ jobs:
         working-directory: ./FrontEnd
         run: flutter analyze || true
 
-      # UPLOAD REPORTS
       - name: Upload SAST Reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -129,7 +122,6 @@ jobs:
     needs: backend-test
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -138,7 +130,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      # PIP AUDIT
       - name: Install pip-audit
         run: pip install pip-audit
 
@@ -150,7 +141,6 @@ jobs:
           --format json \
           > pip-audit-report.json || true
 
-      # TRIVY
       - name: Run Trivy File System Scan
         uses: aquasecurity/trivy-action@master
         with:
@@ -159,7 +149,6 @@ jobs:
           format: "json"
           output: "trivy-report.json"
 
-      # UPLOAD REPORTS
       - name: Upload SCA Reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -180,7 +169,6 @@ jobs:
     needs: [sast, sca]
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -201,11 +189,9 @@ jobs:
       contents: read
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
-    
-    # GENERATE TEMP SSL CERTS
+
       - name: Generate Self-Signed SSL Certificate
         run: |
           openssl req -x509 -nodes -days 1 \
@@ -214,48 +200,49 @@ jobs:
             -out artisan.crt \
             -subj "/CN=localhost"
 
-      # BUILD
       - name: Build Containers
         run: docker compose build
 
-      # START
       - name: Start Containers
         run: docker compose up -d
 
-      # HEALTH CHECK
       - name: Wait for FrontEnd to be Ready
         run: |
-          echo "Waiting for FrontEnd on port 3000..."
+          echo "Waiting for FrontEnd on port 443..."
 
           for i in {1..30}; do
             if curl -k -s https://localhost:443 > /dev/null; then
               echo "FrontEnd is ready!"
               exit 0
             fi
-
             echo "Still starting..."
             sleep 5
           done
 
           echo "FrontEnd failed to start"
-
           docker ps
           docker logs FrontEnd || true
-
           exit 1
 
-      # PREPARE REPORTS
+      # ─────────────────────────────
+      # API SCAN (FASTAPI FIXED)
+      # ─────────────────────────────
+      - name: Run OWASP ZAP API Scan
+        uses: zaproxy/action-api-scan@v0.7.0
+        with:
+          target: "https://localhost:443/api/openapi.json"
+          fail_action: false
+        continue-on-error: true
+
       - name: Prepare ZAP Reports
         run: |
           touch report_html.html
           touch report_json.json
           touch report_md.md
-
           chmod a+rw report_html.html
           chmod a+rw report_json.json
           chmod a+rw report_md.md
 
-      # ZAP
       - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
@@ -265,7 +252,6 @@ jobs:
           cmd_options: "-a"
         continue-on-error: true
 
-      # UPLOAD REPORTS
       - name: Upload ZAP Reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -274,9 +260,9 @@ jobs:
           path: |
             report_html.html
             report_json.json
+            report_md.json
             report_md.md
 
-      # CLEANUP
       - name: Stop Containers
         if: always()
         run: docker compose down

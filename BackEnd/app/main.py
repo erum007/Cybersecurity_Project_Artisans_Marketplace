@@ -8,13 +8,22 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.routes import admin, auth, cart, orders, products, uploads
 
-app = FastAPI()
-raw_origins = os.getenv("CORS_ORIGINS", '["https://artisan.marketplace"]')
+# 1. Determine environment FIRST
+is_production = os.getenv("ENVIRONMENT") == "production"
 
+# 2. Initialize app ONCE with security settings
+app = FastAPI(
+    title=settings.app_name,
+    docs_url=None if is_production else "/docs",
+    redoc_url=None if is_production else "/redoc",
+    openapi_url=None if is_production else "/openapi.json"
+)
+
+# 3. CORS Configuration
+raw_origins = os.getenv("CORS_ORIGINS", '["https://artisan.marketplace"]')
 try:
     origins = json.loads(raw_origins)
 except json.JSONDecodeError:
-    # Fallback to a safe default if env variable is malformed
     origins = ["https://artisan.marketplace"]
 
 app.add_middleware(
@@ -25,10 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# @app.get("/")
-# async def root():
-#     return {"message": "Artisans Marketplace API is Secure and Running"}
-
+# 4. Routes & Mounts
 @app.get("/")
 def healthcheck():
     return {"status": "ok", "app": settings.app_name}

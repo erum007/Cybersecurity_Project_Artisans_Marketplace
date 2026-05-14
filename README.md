@@ -212,10 +212,12 @@ flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8000
 
 
 # Artisans Marketplace - Dockerized
-1. Clone repository.
-2. Navigate to project root.
-3. Run docker compose up -d
-
+1. Run Notepad as Administrator. Click File->Open and Enter Path C:/[User_Name]/Windows/System32/drivers/etc/hosts and at the end of the file, add 127.0.0.1 artisan.marketplace
+2. Save and Close.
+3. Clone repository.
+4. Navigate to project root through terminal of choice.
+6. Run docker compose up -d (after installing and setting up Docker).
+7. Run https://artisans.marketplace in browser.
 
 
 
