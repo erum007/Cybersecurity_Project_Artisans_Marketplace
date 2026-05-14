@@ -17,7 +17,8 @@ SAST, completing relevant report sections.
 
 ### Roshaan Khan 
 ### Work Done:
-SCA, completing relevant report sections.
+Static Code Analysis (SCA) - analyzing frontend and backend separate using flutter analyzing, pip audit, bandit and trivy tools to assess critical vulnerabilities and automating the process - merging with main. Worked on relevant report sections - exploitation documentation and remediation documentation.
+
 
 ---
 
