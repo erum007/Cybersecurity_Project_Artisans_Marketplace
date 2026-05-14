@@ -82,47 +82,33 @@ The actual scanner outputs were saved as text artifacts in the remediation repor
 - `Docs/Remediation Report/safety-output-jose.txt`
 - `Docs/Remediation Report/flutter-outdated.txt`
 
-# REMEDIATION REPORT (NGINX HARDENING)
+## NGINX HARDENING BASED ON ZAP FINDINGS
 
-## Overview
-Nginx reverse proxy was hardened to improve security while maintaining Flutter Web compatibility.
-
----
-
-## 1. TLS HARDENING
-
-ssl_protocols TLSv1.2 TLSv1.3;
-ssl_prefer_server_ciphers on;
-ssl_ciphers <strong-cipher-suite-set>;
-
-### Improvement
-- Removes TLS 1.0/1.1
-- Prevents downgrade attacks
+## 1. Remediation Overview
+The Nginx reverse proxy was hardened to enforce modern security standards. The following table maps the identified risks to their specific technical fixes.
 
 ---
 
-## 2. HSTS ENABLED
+## 2. Resolved Vulnerabilities
 
-add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-
-### Benefit
-- Forces HTTPS only
-- Prevents SSL stripping attacks
+| Vulnerability | Remediation Action | Nginx Implementation |
+| :--- | :--- | :--- |
+| **Weak Encryption** | Disabled TLS 1.0/1.1; Enforced Strong Ciphers | `ssl_protocols TLSv1.2 TLSv1.3;` |
+| **Clickjacking** | Restricted framing to the same origin | `add_header X-Frame-Options "SAMEORIGIN";` |
+| **MIME Sniffing** | Disabled browser content-type guessing | `add_header X-Content-Type-Options "nosniff";` |
+| **MitM / Hijacking** | Enforced HSTS (Strict HTTPS) | `add_header Strict-Transport-Security ... always;` |
+| **Information Leak** | Disabled Nginx version signatures | `server_tokens off;` |
+| **CORS Conflict** | Unified headers via `proxy_hide_header` | `proxy_hide_header 'Access-Control-Allow-Origin';` |
 
 ---
 
-## 3. SECURITY HEADERS
+## 3. SECURITY HEADER SPECIFICS
 
 add_header X-Content-Type-Options "nosniff" always;
 add_header X-Frame-Options "SAMEORIGIN" always;
 add_header X-XSS-Protection "1; mode=block" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-
-### Benefit
-- Clickjacking protection
-- MIME sniffing protection
-- Browser API restrictions
 
 ---
 
@@ -131,10 +117,6 @@ add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
 add_header Cross-Origin-Opener-Policy "same-origin" always;
 add_header Cross-Origin-Embedder-Policy "require-corp" always;
 add_header Cross-Origin-Resource-Policy "same-origin" always;
-
-### Benefit
-- Prevents cross-origin data leaks
-- Isolates browser context
 
 ---
 
@@ -151,73 +133,44 @@ base-uri 'self';
 frame-ancestors 'self';
 " always;
 
-### Justification
-Unsafe directives are required for Flutter Web runtime.
-
 ---
 
 ## 6. CACHE CONTROL
 
 add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
 
-### Benefit
-- Prevents sensitive caching
-- Reduces data leakage risk
-
 ---
 
-## 7. REMAINING ACCEPTED RISKS
-
-### Findings
-- CSP unsafe-eval (required)
-- CSP unsafe-inline (required)
-- CSP wildcard sources (CDN dependency)
-- CSP notices (non-critical)
-
-### Mitigation
-- HTTPS enforced
-- strict origin isolation
-- reverse proxy security controls
-
----
-
-## FINAL CONCLUSION
-
-System is hardened using TLS 1.2+, secure headers, CSP restrictions, and cross-origin isolation.
-
-Remaining CSP issues are framework-imposed and accepted due to Flutter Web constraints.
-
-# Security Remediation & Hardening Report
-
-## 1. Remediation Overview
-The Nginx reverse proxy was hardened to enforce modern security standards. The following table maps the identified risks to their specific technical fixes.
-
-## 2. Resolved Vulnerabilities
-
-| Vulnerability | Remediation Action | Nginx Implementation |
-| :--- | :--- | :--- |
-| **Weak Encryption** | Disabled TLS 1.0/1.1; Enforced Strong Ciphers | `ssl_protocols TLSv1.2 TLSv1.3;` |
-| **Clickjacking** | Restricted framing to the same origin | `add_header X-Frame-Options "SAMEORIGIN";` |
-| **MIME Sniffing** | Disabled browser content-type guessing | `add_header X-Content-Type-Options "nosniff";` |
-| **MitM / Hijacking** | Enforced HSTS (Strict HTTPS) | `add_header Strict-Transport-Security ... always;` |
-| **Information Leak** | Disabled Nginx version signatures | `server_tokens off;` |
-| **CORS Conflict** | Unified headers via `proxy_hide_header` | `proxy_hide_header 'Access-Control-Allow-Origin';` |
-
-## 3. Residual Risk Justification (Accepted Risks)
+## 7. Residual Risk Justification (Accepted Risks)
 During the OWASP ZAP scan, some **Medium** risks remained. These are necessary for the **Flutter Web** framework to function and have been mitigated as much as possible.
 
-### 3.1 `unsafe-inline` and `unsafe-eval` in CSP
+### 7.1 `unsafe-inline` and `unsafe-eval` in CSP
 *   **Reason:** Flutter’s **CanvasKit (WebAssembly)** engine requires these for high-performance rendering. Blocking them results in a "Blank Screen" error.
 *   **Mitigation:** We have limited the `script-src` to trusted domains (`'self'`, `gstatic.com`, `unpkg.com`) and `blob:` sources only.
 
-### 3.2 Wildcard and Blob Directives
+### 7.2 Wildcard and Blob Directives
 *   **Reason:** Flutter uses **Web Workers** and **Blobs** for background image processing. 
 *   **Mitigation:** The directives are scoped specifically to `blob:` and your internal backend address (`http://127.0.0.1:8000`) rather than a global `*`.
 
-### 3.3 `style-src unsafe-inline`
+### 7.3 `style-src unsafe-inline`
 *   **Reason:** Flutter generates dynamic CSS styles to position UI elements on the screen.
 *   **Mitigation:** This is a standard requirement for SPA (Single Page Application) frameworks like Flutter and React.
 
-## 4. Conclusion
+---
+
+## 8. Benefits of Fixes
+- Prevents sensitive caching
+- Reduces data leakage risk
+- - Clickjacking protection
+- MIME sniffing protection
+- Browser API restrictions
+- - Prevents cross-origin data leaks
+- Isolates browser context
+
+---
+
+## 9. Conclusion
 The Artisan Marketplace is now compliant with modern web security best practices. All High-risk vulnerabilities have been eliminated, and remaining Medium-risk items have been documented as essential framework requirements with appropriate compensating controls.
+
+
 
