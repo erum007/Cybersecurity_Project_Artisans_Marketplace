@@ -16,15 +16,31 @@ Three classes of security testing were performed:
 2. **SCA (Software Composition Analysis):** pip-audit and Trivy to identify known CVEs in third-party dependencies.
 3. **DAST (Dynamic Application Security Testing):** OWASP ZAP scans against the running containerized application, targeting the frontend on port 51235 and the API on port 8000.
 
+
 ## Key Findings Summary
+ 
+| Severity | Count | Examples (across SAST, SCA, and DAST) |
+|----------|-------|---------------------------------------|
+| Critical | 1 | Hardcoded JWT secret committed in source code |
+| High | 8 | No token revocation, no refresh token rotation, CORS wildcard; 4 critical CVEs in third-party libraries (python-multipart, python-jose) |
+| Medium | 10 | Weak password hashing, missing rate limiting, outdated hashing algorithms (MD5, SHA-1), insecure TLS configuration, vulnerable dependency (python-dotenv), clickjacking exposure, MIME sniffing, CSP policy weaknesses |
+| Low | 4 | Missing security headers, verbose error messages, no idle session timeout, hardcoded token string in code |
+ 
 
-| Severity | Count | Examples |
-|----------|-------|---------|
-| Critical | 1 | Hardcoded JWT secret in source code |
-| High | 3 | No token revocation, CORS wildcard, no refresh token rotation |
-| Medium | 2 | SHA-256 password hashing (now remediated), missing rate limiting |
-| Low | 4 | Missing security headers, verbose error messages, no idle timeout |
-
+### SAST Findings: Code-Level Issues Identified
+ 
+The automated code scans surfaced seven distinct vulnerabilities. All but two have been resolved:
+ 
+| ID | Issue | Severity | Status |
+|----|-------|----------|--------|
+| V-01 | Overly permissive cross-origin access policy (CORS wildcard) | Medium | ✓ Fixed |
+| V-02 | Hardcoded credential values embedded in source files | High | ✓ Fixed |
+| V-03 | Missing enforcement of modern encryption protocols (TLS) | Medium | ✓ Fixed |
+| V-04 | Hardcoded authentication token string in code | Low | ✓ Resolved |
+| V-05 | Debug mode flag — confirmed false positive, no real risk | Critical (FP) | ✓ Resolved |
+| V-06 | Use of outdated hashing algorithm (MD5) | Medium | Open |
+| V-07 | Use of outdated hashing algorithm (SHA-1) | Medium | Open |
+ 
 ## Remediation Implemented
 Three phases of remediation were implemented as part of this project:
 - **Phase 1:** Refresh token system — short-lived access tokens (40 min) paired with long-lived refresh tokens (7 days) stored server-side, with silent re-authentication in the Flutter client.
