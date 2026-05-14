@@ -38,8 +38,8 @@ The automated code scans surfaced seven distinct vulnerabilities. All but two ha
 | V-03 | Missing enforcement of modern encryption protocols (TLS) | Medium | ✓ Fixed |
 | V-04 | Hardcoded authentication token string in code | Low | ✓ Resolved |
 | V-05 | Debug mode flag — confirmed false positive, no real risk | Critical (FP) | ✓ Resolved |
-| V-06 | Use of outdated hashing algorithm (MD5) | Medium | Open |
-| V-07 | Use of outdated hashing algorithm (SHA-1) | Medium | Open |
+| V-06 | Use of outdated hashing algorithm (MD5) | Medium | ✓ Resolved |
+| V-07 | Use of outdated hashing algorithm (SHA-1) | Medium | ✓ Resolved|
  
 ## Remediation Implemented
 Three phases of remediation were implemented as part of this project:
