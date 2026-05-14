@@ -1,5 +1,15 @@
 # Executive Summary — Artisans Marketplace Security Assessment
 
+# Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Scope of Assessment](#scope-of-assessment)
+3. [Assessment Activities](#assessment-activities)
+4. [Key Findings Summary](#key-findings-summary)
+   - 4.1 [SAST Findings: Code-Level Issues Identified](#sast-findings-code-level-issues-identified)
+5. [Remediation Implemented](#remediation-implemented)
+6. [Overall Risk Rating](#overall-risk-rating)
+
 ## Project Overview
 Artisans Marketplace is a full-stack e-commerce platform built for local artisans, developed as part of the Habib University Cybersecurity course. The application consists of a Flutter frontend (targeting web/Chrome), a FastAPI Python backend, and a MongoDB database, deployed via Docker Compose with an nginx TLS reverse proxy.
 
