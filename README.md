@@ -13,7 +13,7 @@ Password strength validation, JWT token expiry setup, setting up ci.yml pipeline
 
 ### Khadija Abbas 
 ### Work Done:
-SAST, working on threat model / architecture diagrams, completing relevant report sections.
+Dockerization, SAST, working on threat model / architecture diagrams, completing relevant report sections.
 
 ### Roshaan Khan 
 ### Work Done:
